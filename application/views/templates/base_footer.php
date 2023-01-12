@@ -75,6 +75,8 @@
                 const res = response.data;
                 if(res > 0){
                   $('.session-counter').text(res);
+                }else{
+                  $('.session-counter').text("");
                 }
               }
             }
