@@ -12,6 +12,7 @@ class MedicineCategory_model extends CI_Model {
     public function get_all_categories()
     {
         $this->db->select('medcat_name as title, medcat_token as token');
+        $this->db->order_by('medcat_name', 'ASC');
         return $this->db->get('medicine_categories')->result();
     }
     

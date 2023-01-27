@@ -12,7 +12,6 @@
           <table id="table_treated" class="table table-striped table-sm nowrap" style="width:100%">
             <thead>
               <tr>
-                <th scope="col">#</th>
                 <th scope="col">Patient Name</th>
                 <th scope="col">Patient PF</th>
                 <th scope="col">Mobile</th>

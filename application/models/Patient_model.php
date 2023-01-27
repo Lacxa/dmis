@@ -19,6 +19,34 @@ class Patient_model extends CI_Model {
         //  Set searchable column fields for pharmacy
         $this->column_search_ph = array('p.pat_file_no', 'p.pat_fname', 'p.pat_mname', 'p.pat_lname', 'p.pat_phone');
     }
+
+    public function check_if_uuid_exist_patient_table($uuid)
+    {
+        $this->db->where('pat_id', $uuid);
+        $query = $this->db->get('patient');
+        return $query->num_rows() > 0;
+    }
+    
+    public function check_if_uuid_exist_record_table($uuid)
+    {
+        $this->db->where('rec_id', $uuid);
+        $query = $this->db->get('patient_record');
+        return $query->num_rows() > 0;
+    }
+
+    public function check_if_uuid_exist_visit_table($uuid)
+    {
+        $this->db->where('vs_id', $uuid);
+        $query = $this->db->get('patient_visit');
+        return $query->num_rows() > 0;
+    }
+
+    public function check_if_uuid_exist_symptoms_table($uuid)
+    {
+        $this->db->where('sy_id', $uuid);
+        $query = $this->db->get('patient_symptoms');
+        return $query->num_rows() > 0;
+    }
     
     public function search_patient_by_keyword($keyword)
     {
@@ -309,7 +337,7 @@ class Patient_model extends CI_Model {
         // $this->db->where('v.vs_visit', 'nimetoka_lab');
         // $this->db->or_group_start();
         // $this->db->where('v.vs_visit', 'nipo_daktari_2');
-        // $this->db->like('v.vs_attendants', $this->session->userdata('user_pf'), 'before');
+        $this->db->like('v.vs_attendants', $this->session->userdata('user_pf'), 'after');
         // $this->db->group_end();
         // $this->db->group_end();      
         return $this->db->count_all_results();
@@ -332,7 +360,7 @@ class Patient_model extends CI_Model {
         $this->db->where('v.vs_visit', 'nimerudishwa_kutoka_lab');
         // $this->db->group_start();
         // $this->db->where('v.vs_visit', 'nimerudishwa_kutoka_lab');
-        // $this->db->like('v.vs_attendants', $this->session->userdata('user_pf'), 'after');
+        $this->db->like('v.vs_attendants', $this->session->userdata('user_pf'), 'after');
         // $this->db->or_group_start();
         // $this->db->where('v.vs_visit', 'nipo_daktari_1r');
         // $this->db->like('v.vs_attendants', $this->session->userdata('user_pf'), 'after');
@@ -371,7 +399,7 @@ class Patient_model extends CI_Model {
         $this->db->where('v.vs_visit', 'nimerudishwa_kutoka_ph');
         // $this->db->group_start();
         // $this->db->where('v.vs_visit', 'nimerudishwa_kutoka_ph');
-        // $this->db->like('v.vs_attendants', $this->session->userdata('user_pf'), 'after');
+        $this->db->like('v.vs_attendants', $this->session->userdata('user_pf'), 'after');
         // $this->db->or_group_start();
         // $this->db->where('v.vs_visit', 'nipo_daktari_2r');
         // $this->db->like('v.vs_attendants', $this->session->userdata('user_pf'), 'after');
@@ -710,7 +738,7 @@ class Patient_model extends CI_Model {
         // $this->db->where('v.vs_visit', 'nimetoka_lab');
         // $this->db->or_group_start();
         // $this->db->where('v.vs_visit', 'nipo_daktari_2');
-        // $this->db->like('v.vs_attendants', $this->session->userdata('user_pf'), 'before');
+        $this->db->like('v.vs_attendants', $this->session->userdata('user_pf'), 'after');
         // $this->db->group_end();
         // $this->db->group_end();
         $this->db->order_by('r.rec_regdate');
@@ -754,6 +782,7 @@ class Patient_model extends CI_Model {
         $this->db->where('s.sy_investigations is NOT NULL', NULL, FALSE);
         $this->db->where('s.sy_lab', 1);
         $this->db->where('v.vs_visit', 'nimerudishwa_kutoka_lab');
+        $this->db->like('v.vs_attendants', $this->session->userdata('user_pf'), 'after');
         // $this->db->group_start();
         // $this->db->where('v.vs_visit', 'nimerudishwa_kutoka_lab');
         // $this->db->like('v.vs_attendants', $this->session->userdata('user_pf'), 'after');
@@ -854,6 +883,7 @@ class Patient_model extends CI_Model {
         $this->db->where('r.rec_care', 0);
         $this->db->where('s.sy_complaints is NOT NULL', NULL, FALSE);
         $this->db->where('v.vs_visit', 'nimerudishwa_kutoka_ph');
+        $this->db->like('v.vs_attendants', $this->session->userdata('user_pf'), 'after');
         // $this->db->group_start();
         // $this->db->where('v.vs_visit', 'nimerudishwa_kutoka_ph');
         // $this->db->like('v.vs_attendants', $this->session->userdata('user_pf'), 'after');
@@ -1382,7 +1412,7 @@ class Patient_model extends CI_Model {
         // Configure medicines data
         if($row['sy_medicines'] != NULL)
         {
-            $this->load->model('medicine_model', 'medicine');
+            // $this->load->model('medicine_model', 'medicine');
             $this->load->model('stock_model', 'stock');
             $medicine_array = explode("_", $row['sy_medicines']);
             foreach ($medicine_array as $value)
@@ -1396,8 +1426,8 @@ class Patient_model extends CI_Model {
                 {
                     $nill_stock = array(
                         'token' => '10000001',
-                        'text' => 'Not available',
-                        'title' => 'NILL',
+                        'medicine1' => 'Out of stock',
+                        'medicine2' => 'O/S',
                         'doctor_desc' => $doctor_desc,
                     );
                     $row['medicines'][] = $nill_stock; 
@@ -1405,11 +1435,6 @@ class Patient_model extends CI_Model {
                 else
                 {
                     $stock = $this->stock->getStockByToken($stock_token);
-                    $medicine_basic = $this->medicine->getMedicineByToken($stock->medicine);
-                    // $medicine_data = $this->medicine->getMedicineById($medicine_id);
-                    $stock->text = $medicine_basic['text'];
-                    $stock->category = $medicine_basic['category'];
-                    $stock->format = $medicine_basic['format'];
                     $stock->doctor_desc = $doctor_desc;
                     $row['medicines'][] = $stock;
                 }
@@ -1973,27 +1998,46 @@ class Patient_model extends CI_Model {
                             'token' => 10000001,
                             'in' => 0,
                             'text'=> str_replace('$', ' ', $medicine_text),
+                            'medicine1'=> str_replace('$', ' ', $medicine_text),
                         );                        
                     }
                     else
                     {
                         $medicine_data = $this->stock->getStockByToken($medicine_token);
+                        $search = array(
+                            'except' => $medicine_data->id,
+                            'medicine_token' => $medicine_data->medicine_token, 
+                            'unit_token' => $medicine_data->unit_token, 
+                        );
+                        $similar_stock = $this->stock->getSimilarStock($search);
+                        if(!empty($similar_stock))
+                        {
+                            $total = 0;
+                            $used = 0;
+                            foreach ($similar_stock as $key => $row)
+                            {
+                                $total += $row->total;
+                                $used += $row->used;
+                            }
+                            $medicine_data->total += $total;
+                            $medicine_data->used += $used;
+                        }
                         
                         // This is a medicine format
-                        $parent = $this->stock->getStockByID($medicine_data->parent);
-                        $parent_detailed = $this->format->get_format_by_token($parent->title);
+                        // $parent = $this->stock->getStockByID($medicine_data->parent);
+                        // $parent_detailed = $this->format->get_format_by_token($parent->title);
                         
-                        // This is a medicine category
-                        $grand = $this->stock->getStockByID($parent->parent);
-                        $grand_detailed = $this->category->get_category_by_token($grand->title);
+                        // // This is a medicine category
+                        // $grand = $this->stock->getStockByID($parent->parent);
+                        // $grand_detailed = $this->category->get_category_by_token($grand->title);
                         
-                        // This is medicine name
-                        $med_name = $this->medicine->getMedicineByToken($medicine_data->medicine);
+                        // // This is medicine name
+                        // $med_name = $this->medicine->getMedicineByToken($medicine_data->medicine);
                         
-                        $medicine_data->parent = $parent_detailed->title;
-                        $medicine_data->grand = $grand_detailed->title;
+                        // $medicine_data->parent = $parent_detailed->title;
+                        // $medicine_data->grand = $grand_detailed->title;
                         $medicine_data->text = str_replace('$', ' ', $medicine_text);
-                        $medicine_data->medicine_name = $med_name['text'];
+                        // $medicine_data->medicine_name = $med_name['text'];
                         $medicine_data->in = 1;
                         $data[] = $medicine_data;
                     }
@@ -2135,7 +2179,8 @@ class Patient_model extends CI_Model {
             $this->db->where('s.sy_diseases IS NOT NULL', NULL, FALSE);
             $this->db->where('s.sy_medicines IS NOT NULL', NULL, FALSE);
             $ignore = array('nipo_daktari_1', 'nipo_daktari_2', 'nasubiri_daktari', 'nimerudishwa_kutoka_lab', 'nimerudishwa_kutoka_ph');
-            $this->db->where_not_in('v.vs_visit', $ignore);
+            // $this->db->where_not_in('v.vs_visit', $ignore);
+            $this->db->where('v.vs_visit', 'nimetoka_ph');
             $this->db->order_by('r.rec_regdate', 'DESC');
             
             $query = $this->db->get();
@@ -2147,7 +2192,7 @@ class Patient_model extends CI_Model {
                 $this->load->model('investigation_model', 'investigationModel');
                 $this->load->model('disease_model', 'diseaseModel');
                 $this->load->model('stock_model', 'stockModel');
-                $this->load->model('medicine_model', 'medicineModel');
+                // $this->load->model('medicine_model', 'medicineModel');
                 $this->load->model('employee_model', 'employeeModel');
 
                 foreach ($query->result_array() as $row)                
@@ -2223,10 +2268,17 @@ class Patient_model extends CI_Model {
                                 $stock_data = $this->stockModel->getStockByToken($med_stock_code);
                                 if(!empty($stock_data))
                                 {
-                                    $medicine_data = $this->medicineModel->getMedicineByToken($stock_data->medicine);
-                                    $medicine_data['doctor_desc'] = $doctor_desc;
-                                    $medicine_data['unit'] = $stock_data->title;
-                                    $row['patient_medicines'][] = $medicine_data;
+                                    // $medicine_data = $this->medicineModel->getMedicineByToken($stock_data->medicine);
+                                    $usage = $this->stockModel->getStockUsageByRecordAndStock($row['instance'], $stock_data->id);
+                                    $total_usage = 0;
+                                    foreach ($usage as $cons)
+                                    {
+                                        $total_usage += $cons->used;
+                                    }
+                                    // $medicine_data['unit'] = $stock_data->title;
+                                    $stock_data->doctor_desc = $doctor_desc;
+                                    $stock_data->consumption = $total_usage;
+                                    $row['patient_medicines'][] = $stock_data;
                                 }
                                 else
                                 {
@@ -2445,6 +2497,12 @@ class Patient_model extends CI_Model {
             $this->db->where('rec_id', $id);
             $this->db->delete('patient_record');
         }
+        
+        public function deleteById($table, $column_pk, $pk_data)
+        {
+            $this->db->where($column_pk, $pk_data);
+            $this->db->delete($table);
+        }
 
         public function get_monitor_data($postData)
         {
@@ -2459,6 +2517,16 @@ class Patient_model extends CI_Model {
         public function get_served_patients($postData)
         {
             $this->_get_served_patients_data_datatables_query($postData);
+            if(isset($postData['length']) && $postData['length'] != -1){
+                $this->db->limit($postData['length'], $postData['start']);
+            }
+            $query = $this->db->get();
+            return $query->result();
+        }
+
+        public function get_incomplete_patients($postData)
+        {
+            $this->_get_incomplete_patients_data_datatables_query($postData);
             if(isset($postData['length']) && $postData['length'] != -1){
                 $this->db->limit($postData['length'], $postData['start']);
             }
@@ -2541,6 +2609,50 @@ class Patient_model extends CI_Model {
             }
         }
 
+        public function eligibleToResetRecord($record)
+        {
+            $this->db->from('patient_record r');
+            $this->db->join('patient_visit v', 'v.vs_record_id = r.rec_id', 'left');
+            $this->db->where('DATE(r.rec_regdate) + INTERVAL 2 DAY < NOW()');
+            $this->db->where('v.vs_visit !=', 'nimetoka_ph');
+            $this->db->where('r.rec_id', $record);
+            $query = $this->db->get();
+            return ($query->num_rows() > 0);
+        }
+    
+        private function _get_incomplete_patients_data_datatables_query($postData)
+        {
+            $this->db->from('patient_record r');
+            $this->db->join('patient p', 'p.pat_id = r.rec_patient_id', 'left');
+            $this->db->join('patient_visit v', 'v.vs_record_id = r.rec_id', 'left');
+            $this->db->join('patient_symptoms s', 's.sy_record_id = r.rec_id', 'left');$this->db->where('DATE(r.rec_regdate) + INTERVAL 2 DAY < NOW()');
+            $this->db->where('v.vs_visit !=', 'nimetoka_ph');
+            $this->db->order_by('r.rec_regdate', 'ASC');
+            
+            $i = 0;
+            // loop searchable columns 
+            foreach($this->column_search_doctor as $item){
+                // if datatable send POST for search
+                if(isset($postData['search']) && $postData['search']['value']){
+                    // first loop
+                    if($i===0){
+                        // open bracket
+                        $this->db->group_start();
+                        $this->db->like($item, $postData['search']['value']);
+                    }else{
+                        $this->db->or_like($item, $postData['search']['value']);
+                    }
+                    
+                    // last loop
+                    if(count($this->column_search_doctor) - 1 == $i){
+                        // close bracket
+                        $this->db->group_end();
+                    }
+                }
+                $i++;
+            }
+        }
+
         public function countAllForMonitor()
         {
             $this->db->from('patient_record r');
@@ -2570,6 +2682,17 @@ class Patient_model extends CI_Model {
             return $this->db->count_all_results();
         }
 
+        public function countAllIncompletePatients()
+        {
+            $this->db->from('patient_record r');
+            $this->db->join('patient p', 'p.pat_id = r.rec_patient_id', 'left');
+            $this->db->join('patient_visit v', 'v.vs_record_id = r.rec_id', 'left');
+            $this->db->join('patient_symptoms s', 's.sy_record_id = r.rec_id', 'left');
+            $this->db->where('DATE(r.rec_regdate) + INTERVAL 2 DAY < NOW()');
+            $this->db->where('v.vs_visit !=', 'nimetoka_ph');
+            return $this->db->count_all_results();
+        }
+
         public function countAllServedDashboard($distribution, $date)
         {
             $this->db->from('patient_record r');
@@ -2595,6 +2718,13 @@ class Patient_model extends CI_Model {
         public function countFilteredAllServedPatients($postData)
         {
             $this->_get_served_patients_data_datatables_query($postData);
+            $query = $this->db->get();
+            return $query->num_rows();
+        }
+
+        public function countFilteredAllIncompletePatients($postData)
+        {
+            $this->_get_incomplete_patients_data_datatables_query($postData);
             $query = $this->db->get();
             return $query->num_rows();
         }

@@ -32,7 +32,7 @@ class Admin extends CI_Controller {
     {
       if(session_status() == PHP_SESSION_NONE) session_start();
       $this->session->set_userdata('user_isActive', FALSE);
-      $this->session->set_flashdata('error', 'Oops!, your account is not active');
+      $this->session->set_flashdata('error', 'Your session is expired/de-actived');
       redirect(base_url('login'));
     }
   }

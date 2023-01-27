@@ -28,13 +28,13 @@ class Medicine_model extends CI_Model {
         return $query->result();
     }
     
-    public function get_medicines_by_cat_format($category, $format)
+    public function get_medicines_by_category_form($category, $form=NULL)
     {
-        $this->db->select('m.med_id as id, m.med_name as text, med_token as token, m.med_alias as short, c.medcat_name as category, f.format_name as format');
+        $this->db->select('m.med_id as id, m.med_name as name, med_token as token, m.med_alias as name2, c.medcat_name as category, f.format_name as form');
         $this->db->join('medicine_categories c', 'c.medcat_token = m.med_category', 'left');
         $this->db->join('medicine_formats f', 'f.format_token = m.med_format', 'left');
         $this->db->where('m.med_category', $category);
-        $this->db->where('m.med_format', $format);
+        if(!empty($form)) $this->db->where('m.med_format', $form);
         $this->db->order_by('m.med_name');
         $query = $this->db->get('medicines m');
         return $query->result();
@@ -75,7 +75,7 @@ class Medicine_model extends CI_Model {
         $this->db->from('medicines m');
         $this->db->join('medicine_categories c', 'c.medcat_token = m.med_category', 'left');
         $this->db->join('medicine_formats f', 'f.format_token = m.med_format', 'left');
-        $this->db->order_by('m.med_token');
+        $this->db->order_by('m.med_token', 'DESC');
         
         $i = 0;
         // loop searchable columns 

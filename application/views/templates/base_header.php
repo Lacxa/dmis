@@ -213,25 +213,23 @@ $csrf = array(
             <!-- </li>End Messages Nav -->
 
             <li class="nav-item dropdown pe-3">
-
-              <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-                <img src="<?php echo base_url('assets/img/nit.png');?>" alt="Profile" class="rounded-circle">
-                <span class="d-none d-md-block dropdown-toggle ps-2"> <?php echo $this->session->userdata('user_fname')[0].'. '.$this->session->userdata('user_lname'); ?></span>
-              </a><!-- End Profile Image Icon -->
-
-              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-                <li class="dropdown-header">
-                  <h6><?php echo $this->session->userdata('user_fname').'&nbsp;'.$this->session->userdata('user_lname'); ?></h6>
-                  <span><?php echo strtoupper($this->session->userdata('user_category')).'&nbsp;('.strtoupper($this->session->userdata('user_role_name')).')';?></span>
-                </li>
-                <li>
-                  <hr class="dropdown-divider">
-                </li>
+              
+            <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+              <img src="<?php echo base_url('assets/img/nit.png');?>" alt="Profile" class="rounded-circle">
+              <span class="d-none d-md-block dropdown-toggle ps-2"> <?php echo $this->session->userdata('user_fname')[0].'. '.$this->session->userdata('user_lname'); ?></span>
+            </a>
+            
+            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+              <li class="dropdown-header">
+                <h6><?php echo $this->session->userdata('user_fname').'&nbsp;'.$this->session->userdata('user_lname'); ?></h6>
+                <span><?php echo strtoupper($this->session->userdata('user_category')).'&nbsp;('.strtoupper($this->session->userdata('user_role_name')).')';?></span>
+              </li>
+              <li><hr class="dropdown-divider"></li>
 
                 <li>
-                  <a class="dropdown-item d-flex align-items-center" href="<?php echo base_url('password/expired/0');?>">
+                  <a class="dropdown-item d-flex align-items-center" href="<?php echo base_url('password/change/0/'.@$header);?>">
                     <i class="bi bi-gear"></i>
-                    <span>Reset Password</span>
+                    <span>Change Password</span>
                   </a>
                 </li>
                 <li>
@@ -255,15 +253,17 @@ $csrf = array(
 
       <!-- ======= Sidebar ======= -->
       <aside id="sidebar" class="sidebar">
-
         <ul class="sidebar-nav" id="sidebar-nav">
-
+          
+        <?php if($this->session->userdata('user_role') == 'SUPER' || $this->session->userdata('user_role') == 'ADMIN' || $this->session->userdata('user_role') == 'PH') { ?>
           <li class="nav-item">
             <a class="nav-link " href="<?php echo base_url();?>">
               <i class="bi bi-grid"></i>
               <span>Dashboard</span>
             </a>
           </li>
+          <?php } ?>
+
           <li class="nav-heading">Pages</li>
 
           <?php if($this->session->userdata('user_role') == 'SUPER' || $this->session->userdata('user_role') == 'ADMIN') { ?>
@@ -298,14 +298,16 @@ $csrf = array(
            <li class="nav-item">
             <a class="nav-link collapsed" href="<?php echo base_url('pharmacy/patients');?>">
               <i class="bi bi-prescription"></i>
-              <span> Prescriptions</span>
+              <span> Prescription
+                <span class="badge bg-danger badge-number prescription-counter"></span>
+              </span>
             </a>
           </li>
 
           <li class="nav-item">
             <a class="nav-link collapsed" href="<?php echo base_url('pharmacy/stock-register');?>">
-              <i class="bi bi-capsule"></i>
-              <span>Stock Register</span>
+              <i class="bi bi-capsule-pill"></i>
+              <span>Medicine Stock</span>
             </a>
           </li>
 
@@ -316,12 +318,7 @@ $csrf = array(
             <ul id="config-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
               <li>
                 <a href="<?php echo base_url('pharmacy/medicine-names');?>">
-                  <i class="bi bi-circle"></i><span>Medicine Names</span>
-                </a>
-              </li>
-              <li>
-                <a href="<?php echo base_url('pharmacy/medicine-formats');?>">
-                  <i class="bi bi-circle"></i><span>Medicine Formats</span>
+                  <i class="bi bi-circle"></i><span>Medicine List</span>
                 </a>
               </li>
               <li>
@@ -329,44 +326,52 @@ $csrf = array(
                   <i class="bi bi-circle"></i><span>Medicine Categories</span>
                 </a>
               </li>
+              <li>
+                <a href="<?php echo base_url('pharmacy/medicine-formats');?>">
+                  <i class="bi bi-circle"></i><span>Medicine Forms</span>
+                </a>
+              </li>
+              <li>
+                <a href="<?php echo base_url('pharmacy/medicine-units');?>">
+                  <i class="bi bi-circle"></i><span>Medicine Units</span>
+                </a>
+              </li>
             </ul>
           </li>
 
-          <li class="nav-item">
+          <!-- <li class="nav-item">
             <a class="nav-link collapsed" data-bs-target="#export-nav" data-bs-toggle="collapse" href="#">
               <i class="bi bi-search"></i><span>Extra</span><i class="bi bi-chevron-down ms-auto"></i>
             </a>
             <ul id="export-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
               <li>
-                <!-- <a href="<f?php echo base_url('pharmacy/search-master');?>"> -->
-                  <a href="#">
+                <a href="<f?php echo base_url('pharmacy/search-master');?>">
                     <i class="bi bi-circle"></i><span>Search Master</span>
                   </a>
                 </li>
                 <li>
-                  <a href="<?php echo base_url('pharmacy/reports');?>">
+                  <a href="<f?php echo base_url('pharmacy/reports');?>">
                       <i class="bi bi-circle"></i><span>Reports</span>
                     </a>
                   </li>
                 </ul>
-              </li>
+              </li> -->
 
             <?php } else if($this->session->userdata('user_role') == 'MO'){ ?>
+
+              <li class="nav-item">
+                <a class="nav-link collapsed" href="<?php echo base_url('doctor/patients');?>">
+                  <i class="bi bi-people"></i>
+                  <span>Patients</span>
+                </a>
+              </li>
 
               <li class="nav-item">
                 <a class="nav-link collapsed" href="<?php echo base_url('doctor/session-patients');?>">
                   <i class="bi bi-collection"></i>
                   <span>My Session
                     <span class="badge bg-danger badge-number session-counter"></span>
-                    <!-- <f?php } ?> -->
                   </span>
-                </a>
-              </li>
-
-              <li class="nav-item">
-                <a class="nav-link collapsed" href="<?php echo base_url('doctor/patients');?>">
-                  <i class="bi bi-people"></i>
-                  <span>Patients</span>
                 </a>
               </li>
               
@@ -400,20 +405,22 @@ $csrf = array(
                       <i class="bi bi-circle"></i><span>Edit Investigations</span>
                     </a>
                   </li>
-                  <li>
-                    <a href="<?php echo base_url('doctor/reports');?>">
+                  <!-- <li>
+                    <a href="<f?php echo base_url('doctor/reports');?>">
                       <i class="bi bi-circle"></i><span>Reports</span>
                     </a>
-                  </li>
+                  </li> -->
                 </ul>
               </li>
 
-            <?php } else if($this->session->userdata('user_role') == 'LAB'){ ?>
+            <?php } else if($this->session->userdata('user_role') == 'LAB') { ?>
 
               <li class="nav-item">
                 <a class="nav-link collapsed" href="<?php echo base_url('lab/my-patients');?>">
                   <i class="bi bi-people"></i>
-                  <span>My Patients</span>
+                  <span>My Patients
+                    <span class="badge bg-danger badge-number patients-counter"></span>
+                  </span>
                 </a>
               </li>
 
@@ -431,12 +438,12 @@ $csrf = array(
                 </a>
               </li>
 
-              <li class="nav-item">
-                <a class="nav-link collapsed" href="<?php echo base_url('lab/reports');?>">
-                    <i class="bi bi-printer"></i>
-                    <span>Reports</span>
-                  </a>
-                </li>
+              <!-- <li class="nav-item">
+                <a class="nav-link collapsed" href="<f?php echo base_url('lab/reports');?>">
+                  <i class="bi bi-printer"></i>
+                  <span>Reports</span>
+                </a>
+              </li> -->
 
               <?php } else if($this->session->userdata('user_role') == 'REC'){ ?>
 
@@ -464,12 +471,11 @@ $csrf = array(
                         <i class="bi bi-circle"></i><span>Modifications</span>
                       </a>
                     </li>
-                    <li>
-                      <a href="<?php echo base_url('reception/reports');?>">
-                        <!-- <a href="#"> -->
+                    <!-- <li>
+                      <a href="<f?php echo base_url('reception/reports');?>">
                           <i class="bi bi-circle"></i><span>Reports</span>
                         </a>
-                      </li>
+                      </li> -->
                     </ul>
                   </li>
 
@@ -483,25 +489,36 @@ $csrf = array(
                   <ul id="pro-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
                     <li>
                       <a href="<?php echo base_url('reports/monitor/'.@$header); ?>">
-                        <i class="bi bi-box-arrow-right"></i><span>Monitor</span>
+                        <i class="bi bi-box-arrow-right"></i><span>Patients Monitor</span>
                       </a>
                     </li>
                     <li>
                       <a href="<?php echo base_url('reports/served-patients/'.@$header);?>">
-                        <!-- <a href="#"> -->
-                          <i class="bi bi-circle"></i><span>Treated Patients</span>
-                        </a>
-                      </li>
+                        <i class="bi bi-circle"></i><span>Treated Patients</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="<?php echo base_url('reports/incomplete-patients/'.@$header);?>">
+                        <i class="bi bi-circle"></i><span>Incomplete Patients</span>
+                      </a>
+                    </li>
                     </ul>
                   </li>
                 <?php } ?>
+
+                <li class="nav-item">
+                  <a class="nav-link collapsed" href="<?php echo base_url('home/sign-in-history/'.@$header); ?>">
+                    <i class="bi bi-dash-square"></i>
+                    <span>Sign In History</span>
+                  </a>
+                </li>
 
                 <li class="nav-item">
                   <a class="nav-link collapsed" href="<?php echo base_url('sign-out'); ?>">
                     <i class="bi bi-box-arrow-right"></i>
                     <span>Sign Out</span>
                   </a>
-                </li><!-- End Logout Section Nav -->
+                </li>
 
               </ul>
 
@@ -514,7 +531,7 @@ $csrf = array(
                 <nav>
                   <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="<?php echo base_url();?>"><?php echo @$header; ?></a></li>
-                    <li class="breadcrumb-item active"><?php echo @$heading; ?></li>
+                    <li class="breadcrumb-item active"><?php echo isset($link) ? $link : $heading; ?></li>
                     <?php if(isset($subHeading)) echo '<li class="breadcrumb-item active">'.$subHeading.'</li>';?>
                   </ol>
                 </nav>

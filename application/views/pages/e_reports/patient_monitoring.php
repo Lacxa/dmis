@@ -12,7 +12,6 @@
             <table id="table_monitor" class="table table-striped table-sm nowrap" style="width:100%">
               <thead>
                 <tr>
-                  <th scope="col">#</th>
                   <th scope="col">Patient</th>
                   <th scope="col">Reception</th>
                   <th scope="col">Doctor</th>

@@ -174,7 +174,7 @@ $("#client-report-form").validate({
                                           $.each(data, function(key, value){
                                                 str += '<div class="col-md-6">';
                                                 str += '<div class="card"><div class="card-body">';
-                                                str += `<h5 class="card-title">${value.full_name} (${value.pf}) | <code>${value.day}</code></h5>`;
+                                                str += `<h5 class="card-title">${value.full_name} (${value.pf}) <span>| ${value.day}</span></h5>`;
                                                 str += `<ul class="nav nav-tabs" id="myTab${value.instance}" role="tablist">`;
 
                                                 str += '<li class="nav-item" role="presentation">';
@@ -234,7 +234,7 @@ $("#client-report-form").validate({
                                                 str += '<ol class="list-group list-group-numbered mt-1">';
                                                 $.each(value.patient_medicines, function(key1, val1){
                                                       str += '<li class="list-group-item">';
-                                                      str += val1.id ? `<code>Name: </code>${val1.text}, <code>Category: </code>${val1.category}, <code>Format: </code>${val1.format}, <code>Unit: </code>${val1.unit}, <code>Descriptions: </code>${val1.doctor_desc}` : `<code>O/S: </code>${val1.doctor_desc}`;
+                                                      str += val1.id ? `<code>Name: </code>${val1.medicine1} (${val1.medicine2}), <code>Category: </code>${val1.category}, <code>Form: </code>${val1.form}, <code>Unit: </code>${val1.unit2}, <code>Descriptions: </code>${val1.doctor_desc ? val1.doctor_desc:'Not set'}, <code>Consumption:</code> ${val1.consumption} ` : `<code>O/S: </code>${val1.doctor_desc}`;
                                                       str += '</li>';
                                                 });
                                                 str += '</ol>';

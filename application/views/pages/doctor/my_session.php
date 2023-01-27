@@ -15,9 +15,9 @@ $csrf = array(
             echo '<div class="col-12"><div class="alert alert-danger alert-dismissible fade show" role="alert">'. validation_errors() . '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div></div>'; } if(isset($success) || isset($error)) { echo '<div class="col-12"><div class="alert alert-' . $color .' alert-dismissible fade show" role="alert">'.$message.'<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div></div>';}?>
             
             <div class="col-lg-12" id="session_ids">
-                  <input type="number" name="session_record_id" style="display:none;" id="session_record_id" required>
-                  <input type="number" name="session_symptom_id" style="display:none;" id="session_symptom_id" required>
-                  <input type="number" name="session_visit_id" style="display:none;" id="session_visit_id" required>
+                  <input type="text" name="session_record_id" style="display:none;" id="session_record_id" required>
+                  <input type="text" name="session_symptom_id" style="display:none;" id="session_symptom_id" required>
+                  <input type="text" name="session_visit_id" style="display:none;" id="session_visit_id" required>
             </div>
             <div class="col-lg-12">
                   <div class="card">
@@ -142,7 +142,7 @@ $csrf = array(
                                           <form method="post" action="javascript:void(0);" id="investigationForm">
                                                 <input type="hidden" name="<?php echo $csrf['name'];?>" value="<?php echo $csrf['hash'];?>" />
 
-                                                <div class="accordion row mx-1" id="investigation_categories">
+                                                <div class="accordion row mx-1" id="investigation_categories_">
                                                       <?php foreach ($categories as $value) { ?>
                                                       <div class="accordion-item col-md-6 investigation-block" id="accordion_<?php echo $value->icat_token; ?>">
                                                             <h2 class="accordion-header" id="flush-headingOne<?php echo $value->icat_id; ?>">
@@ -210,10 +210,10 @@ $csrf = array(
             $('input[type=checkbox].parent').change(function(){
                   var parent_id = $(this).closest('.accordion-item').attr('id');
                   var is_parent_checked = $(this).is(':checked');
-                  if(is_parent_checked){
-                        $(`#${parent_id} input[name="investigation_ids"]`).each(function() { 
-                        this.checked = true;
-                  });
+                  if(is_parent_checked) {
+                        $(`#${parent_id} input[name="investigation_ids"]`).each(function() {
+                              this.checked = true;
+                        });
                   } else {
                         $(`#${parent_id} input[name="investigation_ids"]`).each(function() {
                               this.checked = false;
@@ -309,7 +309,7 @@ $csrf = array(
                                     if(diseases.length > 0){
                                           $.each(diseases, function(key, value) {
                                                 $("ol#client_disease").append(`
-                                                      <a class="list-group-item list-group-item-action fw-bold" href="#" name="removeClientDiseaseLink"
+                                                      <a class="list-group-item list-group-item-action text-primary" href="#" name="removeClientDiseaseLink"
                                                       data-id="${value.code}" data-title="${value.text}">${value.text} (<code>${value.code}</code>)</a>
                                                       `);
                                           });
@@ -317,22 +317,23 @@ $csrf = array(
                                     if(medicines.length > 0) {
                                           $.each(medicines, function(key, value) {
                                                 var descInput = `
-                                                <div class="row submitDescForm">
-                                                <div class="col-lg-10">
+                                                <div class="row submitDescForm mt-1">
+                                                <div class="col-md-10">
                                                 <input type="text" id="doctor_description${value.token}" 
                                                 class="form-control form-control-sm" placeholder="Enter further description">
                                                 </div>
-                                                <div class="col-lg-2">
-                                                <button data-id="${value.token}" id="submitDescBtn${value.token}" class="btn btn-primary btn-sm submitDescBtn"> Save </button>
+                                                <div class="col-md-2">
+                                                      <div class="d-grid gap-2">
+                                                            <button data-id="${value.token}" id="submitDescBtn${value.token}" class="btn btn-primary btn-sm"><i class="bi bi-cloud-upload me-1"></i> Save</button>
+                                                      </div>
                                                 </div>
                                                 </div>
                                                 `;
+
                                                 $("ol#client_medicines").append(`
                                                       <li class="list-group-item">
-                                                      <a class="fw-bold" href="#" name="removeClientMedicineLink"
-                                                      data-id="${value.token}" data-title="${value.text}">${value.text+' | <code>Category: </code>'+value.category+', <code>Format: </code>'+value.format+', <code>Unit: </code>'+value.title}
-                                                      </a><div>
-                                                      ${value.doctor_desc=='null' ? descInput : '<code>Descriptions: </code><small>'+value.doctor_desc+'</small>'}
+                                                      <a href="#" name="removeClientMedicineLink"
+                                                      data-id="${value.token}" data-title="${value.medicine1}">${value.medicine1} (${value.medicine2}) ${value.token == '10000001' ? '': '&nbsp;|&nbsp;'+value.category+'&nbsp;|&nbsp;'+value.form+'&nbsp;|&nbsp;'+value.unit_title+':&nbsp;'+value.unit_value+'&nbsp;'+value.unit_name}</a><div>${value.doctor_desc=='null' ? descInput : '<code>Descriptions: </code><small>'+value.doctor_desc+'</small>'}
                                                       </div></li>
                                                       `);
                                           });
@@ -485,6 +486,7 @@ $("div#complaint_result").on('click', 'a', function() {
                                           error: function (jqXHR, textStatus, errorThrown) {
                                                 bootbox.alert(errorThrown.toString(), function () {
                                                       dialog.modal("hide");
+                                                      // console.log(jqXHR);
                                                 });
                                           },
                                     });
@@ -857,22 +859,25 @@ $("ol#client_disease").on('click', 'a', function() {
                   delay: 250,
                   success:function(data)
                   {
+                        // console.log(data);
                         if(data.length > 0){
                               $.each(data, function(key, value) {
                                     var str = '';
-                                    if(value.id == "10000001") {
-                                          str = value.name + ' (' + value.short + ')';
+                                    if(value.stock_token == "10000001") {
+                                          str = `${value.medicine1} (${value.medicine2})`;
                                     } else {
-                                          str = value.name + ' (' + value.short + ') | ' + value.text + ' | ' +value.format + ' <span class="badge bg-primary badge-number">' + value.available + '</span>';
+                                          str = `<code>${value.medicine1} (${value.medicine2})</code> | ${value.category} | ${value.form} | ${value.unit_title}:&nbsp;${value.unit_value}&nbsp;${value.unit_name} | ${value.entry} <span class="badge bg-danger badge-number">${value.total == value.available ? value.available : '<span style="text-decoration: line-through;">'+value.total+'</span> : '+value.available+'</span>'}`;
                                     }
                                     $("#medicine_result").append(`
-                                          <a href="#" name="saveMedicineLink" data-id="${value.id}" data-title="${value.name+' ('+value.text+')'}" class="list-group-item list-group-item-action">${str}</a>
+                                          <a href="#" name="saveMedicineLink" data-id="${value.stock_token}" data-title="${value.medicine1} (${value.medicine2})" class="list-group-item list-group-item-action">${str}</a>
                                           `);
                               });
                         }
                         else {
                               $('#medicine_result').html('<li class="list-group-item text-danger">No results!</li>');
                         }
+                  },error: function(jqXHR, textStatus, errorThrown){
+                        // console.log(jqXHR);
                   }
             });
       }
@@ -904,7 +909,7 @@ $("ol#client_disease").on('click', 'a', function() {
                                     closeButton: false,
                               }).on("shown.bs.modal", function () {
                                     $.ajax({
-                                          url: '<?php echo base_url("doctor/save-patient-medicine/"); ?>'+symptom_id+"/"+record_id+"/"+visit_id,
+                                          url: `<?php echo base_url("doctor/save-patient-medicine/"); ?>${symptom_id}/${record_id}/${visit_id}`,
                                           type: "POST",
                                           dataType: "json",
                                           data: { stock: medicine_id },

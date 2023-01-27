@@ -19,14 +19,27 @@ class Reception extends CI_Controller {
         $this->load->helper(array("url", "html", "form", "security", "date"));
         $this->form_validation->set_error_delimiters('<div class="text-danger">', '</div>');
         
-        $this->is_pwd_expired();
         $this->is_active();
         $this->is_receptionist();
+        $this->is_first_login();
+        $this->is_pwd_expired();
+        
     }
     
     #########################################################
     # PRIVATE FUNCTIONS - TO BE ONLY CALLED WITHIN THIS CLASS
-    
+    #########################################################
+  
+    private function is_first_login()
+    {
+        if(session_status() == PHP_SESSION_NONE) session_start();
+        $is_first_login = $this->session->userdata('user_first_login');
+        if($is_first_login)
+        {
+        redirect(base_url('password/change/1/'.@$this->header), 'refresh');
+        }
+    }
+
     private function is_pwd_expired()
     {
         if(session_status() == PHP_SESSION_NONE) session_start();
@@ -60,7 +73,7 @@ class Reception extends CI_Controller {
         {
             if(session_status() == PHP_SESSION_NONE) session_start();
             $this->session->set_userdata('user_isActive', FALSE);
-            $this->session->set_flashdata('error', 'Oops!, your account is not active');
+            $this->session->set_flashdata('error', 'Your session is expired/de-actived');
             redirect(base_url('login'));
         }
     }
@@ -102,6 +115,30 @@ class Reception extends CI_Controller {
         $unixTime = $dateTime->format('U');
         $now = time();
         return timespan($unixTime, $now, 1) . ' ago';
+    }
+    
+    public function uuid() 
+    {
+        $this->load->library('uuid');
+        //Output a v4 UUID 
+        $uuid4 = $this->uuid->v4();
+        $uuid4 = str_replace('-', '', $uuid4);
+        return $uuid4;
+    }
+    
+    private function check_if_uuid_exist_patient_table($uuid)
+    {
+        return $this->patient_model->check_if_uuid_exist_patient_table($uuid);
+    }
+
+    private function check_if_uuid_exist_record_table($uuid)
+    {
+        return $this->patient_model->check_if_uuid_exist_record_table($uuid);
+    }
+
+    private function check_if_uuid_exist_visit_table($uuid)
+    {
+        return $this->patient_model->check_if_uuid_exist_visit_table($uuid);
     }
     ###########################################################
     ###########################################################
@@ -228,11 +265,17 @@ class Reception extends CI_Controller {
                         $patient_to_update = $this->get_id_by_file_number($patient_file_no);
                         if($patient_to_update == FALSE)
                         {
-                            echo json_encode(array("status" => FALSE , 'data' => '<span class="text-danger"> Oops!, patient is not available </span>'));
+                            echo json_encode(array("status" => FALSE , 'data' => '<code> Oops!, patient is not available </code>'));
                             exit();
                         }
                         else
-                        {                            
+                        {
+                            $record_id = $this->uuid();
+                            while($this->check_if_uuid_exist_record_table($record_id))
+                            {
+                                $record_id = $this->uuid();
+                            }
+
                             $update_data = array();
                             $update_data['pat_file_no'] = $pat_file_no;
                             $update_data['pat_fname'] = strtoupper($pat_fname);
@@ -253,39 +296,51 @@ class Reception extends CI_Controller {
                             if($do_update)
                             {
                                 $instance_data = array(
+                                    'rec_id' => $record_id,
                                     'rec_patient_id' => $patient_to_update['pat_id'],
                                     'rec_patient_file' => $patient_to_update['pat_file_no'],
                                     'rec_regdate' => date('Y-m-d H:i:s'),
                                 );
                                 $create_instance = $this->patient_model->create_patient_instance($instance_data);
-                                echo json_encode(array("status" => TRUE , 'data' => '<span class="text-success"> Registered successifully </span>'));
+                                echo json_encode(array("status" => TRUE , 'data' => '<code> Registered successifully </code>'));
                                 exit();
                             }
                             else
                             {
-                                echo json_encode(array("status" => FALSE , 'data' => '<span class="text-danger"> Internal server error </span>'));
+                                echo json_encode(array("status" => FALSE , 'data' => '<code> Internal server error </code>'));
                                 exit();
-                            }
-                            
+                            }                            
                         }
                     }
                     else
                     {
                         if($this->patient_model->checkPhoneExist($pat_phone))
                         {
-                            echo json_encode(array("status" => FALSE , 'data' => '<span class="text-danger"> Phone number arleady exists! </span>'));
+                            echo json_encode(array("status" => FALSE , 'data' => '<code> Phone number arleady exists! </code>'));
                             exit();
                         }
                         else
-                        {
-                            
+                        {                            
                             $file_no = $this->generate_file_number();
                             while($this->checkIfFileNumberExist($file_no))
                             {
                                 $file_no = $this->generate_file_number();
                             }
+
+                            $patient_id = $this->uuid();
+                            while($this->check_if_uuid_exist_patient_table($patient_id))
+                            {
+                                $patient_id = $this->uuid();
+                            }
+
+                            $record_id = $this->uuid();
+                            while($this->check_if_uuid_exist_record_table($record_id))
+                            {
+                                $record_id = $this->uuid();
+                            }
                             
                             $insert_data = array();
+                            $insert_data['pat_id'] = $patient_id;
                             $insert_data['pat_file_no'] = $file_no;
                             $insert_data['pat_fname'] = strtoupper($pat_fname);
                             if(!empty($pat_mname)) $insert_data['pat_mname'] = strtoupper($pat_mname);
@@ -303,13 +358,14 @@ class Reception extends CI_Controller {
                             $insert_id = $this->patient_model->insert_new_patient($insert_data);
                             
                             $instance_data = array(
-                                'rec_patient_id' => $insert_id,
+                                'rec_id' => $record_id,
+                                'rec_patient_id' => $patient_id,
                                 'rec_patient_file' => $file_no,
                                 'rec_regdate' => date('Y-m-d H:i:s'),
                             );
                             $this->patient_model->create_patient_instance($instance_data);
                             
-                            echo json_encode(array("status" => TRUE , 'data' => '<span class="text-success"> Registered successifully </span>'));
+                            echo json_encode(array("status" => TRUE , 'data' => '<code> Registered successifully </code>'));
                             exit();
                         }
                     }
@@ -353,7 +409,7 @@ class Reception extends CI_Controller {
     
     public function get_patient_by_id()
     {
-        $this->form_validation->set_rules('patient_id', 'Patient', 'trim|required|numeric');
+        $this->form_validation->set_rules('patient_id', 'Patient', 'trim|required');
         
         if ($this->form_validation->run() == FALSE)
         {
@@ -372,7 +428,7 @@ class Reception extends CI_Controller {
             }
             else
             {
-                echo json_encode(array("status" => FALSE , 'data' => '<span class="text-danger"> Oops!, no such entry </span>'));
+                echo json_encode(array("status" => FALSE , 'data' => '<code> Oops!, no such entry </code>'));
                 exit();
             }
         }
@@ -384,7 +440,7 @@ class Reception extends CI_Controller {
         {
             if($this->input->server('REQUEST_METHOD') === 'POST')
             {
-                $this->form_validation->set_rules('record_id', 'Record', 'trim|required|numeric');
+                $this->form_validation->set_rules('record_id', 'Record', 'trim|required');
                 $this->form_validation->set_rules('patient_file', 'Patient File Number', 'trim|required|exact_length[11]');
                 $this->form_validation->set_rules('blood_pressure', 'Blood Pressure', 'trim|required|min_length[5]|max_length[7]');
                 $this->form_validation->set_rules('pulse_rate', 'Pulse Rate', 'trim|required|numeric|greater_than_equal_to[40]|less_than_equal_to[171]');
@@ -412,6 +468,12 @@ class Reception extends CI_Controller {
                     $respiration = $this->security->xss_clean($this->input->post('respiration'));
                     $care = $this->security->xss_clean($this->input->post('care'));
                     $modify = $this->security->xss_clean($this->input->post('modify'));
+
+                    $visit_id = $this->uuid();
+                    while($this->check_if_uuid_exist_visit_table($visit_id))
+                    {
+                        $visit_id = $this->uuid();
+                    }
                     
                     $data = array(
                         'rec_attendant_file_no' => $this->session->userdata('user_pf'),
@@ -428,6 +490,7 @@ class Reception extends CI_Controller {
                     if(empty($modify))
                     {
                         $initial_visit_data = array(
+                            'vs_id' => $visit_id,
                             'vs_record_id' => $record_id,
                             'vs_record_patient_pf' => $patient_file,
                             'vs_visit' => 'nasubiri_daktari',
@@ -435,7 +498,7 @@ class Reception extends CI_Controller {
                         $this->patient_model->initiate_visit($initial_visit_data);
                     }
                     
-                    echo json_encode(array("status" => TRUE , 'data' => '<span class="text-success"> Success</span>'));
+                    echo json_encode(array("status" => TRUE , 'data' => '<code> Success</code>'));
                     exit();
                 }
             } 
@@ -452,13 +515,13 @@ class Reception extends CI_Controller {
         try{
             if(!$this->isEligibleToDelete($record_id))
             {
-                echo json_encode(array("status" => FALSE, 'data' => '<span class="text-danger"> Oops!, action not allowed </span>'));
+                echo json_encode(array("status" => FALSE, 'data' => '<code> Oops!, action not allowed </code>'));
                 exit();
             }
             else
             {
                 $this->patient_model->deleteRecord($record_id);
-                echo json_encode(array("status" => TRUE , 'data' => '<span class="text-success"> Removed successifully</span>'));
+                echo json_encode(array("status" => TRUE , 'data' => '<code> Removed successifully</code>'));
                 exit();
             }
         }
@@ -474,13 +537,13 @@ class Reception extends CI_Controller {
         try{
             if(!$this->isEligibleToDelete2($record_id))
             {
-                echo json_encode(array("status" => FALSE, 'data' => '<span class="text-danger"> Oops!, action not allowed </span>'));
+                echo json_encode(array("status" => FALSE, 'data' => '<code> Oops!, action not allowed </code>'));
                 exit();
             }
             else
             {
                 $this->patient_model->deleteRecord($record_id);
-                echo json_encode(array("status" => TRUE , 'data' => '<span class="text-success"> Removed successifully</span>'));
+                echo json_encode(array("status" => TRUE , 'data' => '<code> Removed successifully</code>'));
                 exit();
             }
         }

@@ -19,28 +19,13 @@ class Lab extends CI_Controller {
     
     $this->is_active();
     $this->is_lab();
+    $this->is_first_login();
     $this->is_pwd_expired();
   }
   
   #########################################################
   # PRIVATE FUNCTIONS - TO BE ONLY ACCESSED WITHIN THIS CLASS
   ######################################################### 
-  
-  private function is_pwd_expired()
-  {
-    if(session_status() == PHP_SESSION_NONE) session_start();
-    $reg_date = $this->session->userdata('user_reg_date');
-    $last_pwd_update = $this->session->userdata('user_last_pwd_update');
-    $last_pwd_update1 = !empty($last_pwd_update) ? $last_pwd_update : $reg_date;
-    
-    $date1 = date_create(date("Y-m-d", strtotime($last_pwd_update1)));
-    $date2 = date_create(date("Y-m-d"));
-    
-    $diff = date_diff($date1, $date2);
-    $days = abs($diff->format("%R%a"));       
-    if($days >= 90) return redirect(base_url('password/expired/0'), 'refresh');
-    
-  }
   
   private function is_active()
   {
@@ -50,7 +35,7 @@ class Lab extends CI_Controller {
     {
       if(session_status() == PHP_SESSION_NONE) session_start();
       $this->session->set_userdata('user_isActive', FALSE);
-      $this->session->set_flashdata('error', 'Oops!, your account is not active');
+      $this->session->set_flashdata('error', 'Your session is expired/de-actived');
       redirect(base_url('login'));
     }
   }
@@ -62,6 +47,31 @@ class Lab extends CI_Controller {
       // return redirect($_SERVER['HTTP_REFERER']);
       return redirect(base_url('login'));
     }
+  }
+  
+  private function is_first_login()
+  {
+    if(session_status() == PHP_SESSION_NONE) session_start();
+    $is_first_login = $this->session->userdata('user_first_login');
+    if($is_first_login)
+    {
+      redirect(base_url('password/change/1/'.@$this->header), 'refresh');
+    }
+  }
+
+  private function is_pwd_expired()
+  {
+    if(session_status() == PHP_SESSION_NONE) session_start();
+    $reg_date = $this->session->userdata('user_reg_date');
+    $last_pwd_update = $this->session->userdata('user_last_pwd_update');
+    $last_pwd_update1 = !empty($last_pwd_update) ? $last_pwd_update : $reg_date;
+
+    $date1 = date_create(date("Y-m-d", strtotime($last_pwd_update1)));
+    $date2 = date_create(date("Y-m-d"));
+    
+    $diff = date_diff($date1, $date2);
+    $days = abs($diff->format("%R%a"));
+    if($days >= 90) return redirect(base_url('password/change/0/'.@$this->header), 'refresh');    
   }
   
   private function get_timespan($post_date, $is_unix=FALSE)
@@ -159,6 +169,12 @@ class Lab extends CI_Controller {
       'heading' => 'Dashboard',
     );
     $this->load->view('pages/lab/dashboard', $data);        
+  }
+
+  public function ajax_count_patients()
+  {
+      echo json_encode(array("status" => TRUE, 'data' => $this->patient_model->countAllForLab()));
+      exit();
   }
   
   public function my_patients()
@@ -284,7 +300,7 @@ class Lab extends CI_Controller {
           // Set preference
           $config['upload_path'] = FCPATH.'uploads/investigations/'; 
           $config['allowed_types'] = 'jpg|jpeg|png|pdf';
-          $config['max_size'] = 1024 * 2;
+          $config['max_size'] = 1024 * 10;
           $config['overwrite'] = TRUE;
           // $config['file_name'] = $_FILES['file']['name'];
           // $config['file_name'] = $new_name;
@@ -339,6 +355,47 @@ class Lab extends CI_Controller {
       }
     }    
   }
+
+  public function reset_patient_results($record_id)
+  {
+    $record = $this->security->xss_clean($record_id);
+    $inv_token = $this->security->xss_clean($this->input->post('token'));
+
+    $inv_data = $this->patient_model->get_patient_lab_results_short($record);
+    if(empty($inv_data))
+    {
+      echo json_encode(array("status" => FALSE, 'data' => '<code>Not found</code>'));
+      exit();
+    }
+    else
+    {
+      $current_inv = $inv_data['sy_investigations'];
+  
+      $explode = explode("^^", $current_inv);
+      $myArray = [];
+      foreach ($explode as $key => $value)
+      {
+        if(strpos($value, $inv_token) === 0)
+        {
+          $new_str = $inv_token . '~null';
+          $myArray[] = $new_str;
+        }
+        else
+        {
+          $myArray[] = $value;
+        }          
+      }
+      $myArray = implode("^^", $myArray);
+      
+      $data = array(
+        'sy_investigations' => $myArray,
+      );
+      $this->patient_model->update_ivestigations($data, $inv_data['sy_id']);
+  
+      echo json_encode(array("status" => TRUE, 'data' => '<code>Success</code>'));
+      exit();
+    }
+  }
   
   public function patient_results_get($record_id)
   {
@@ -351,7 +408,8 @@ class Lab extends CI_Controller {
       $inv_data = $this->patient_model->get_patient_lab_results($record_id, $user_pf);
 
       $new_inv_data = [];
-      foreach ($inv_data as $key => $sub) {
+      foreach ($inv_data as $key => $sub)
+      {
         $parent = $sub['parent'];
         if(!array_key_exists($parent, $new_inv_data)){
           $new_inv_data[$parent] = [];
@@ -376,6 +434,23 @@ class Lab extends CI_Controller {
     {
       return redirect(base_url('lab/my-patients'));
     }    
+  }
+
+  public function patient_results_get2($record_id)
+  {
+    $inv_data = $this->patient_model->get_patient_lab_results($record_id, $this->session->userdata('user_pf'));
+    $new_inv_data = [];
+    foreach ($inv_data as $key => $sub)
+    {
+      $parent = $sub['parent'];
+      if(!array_key_exists($parent, $new_inv_data))
+      {
+        $new_inv_data[$parent] = [];
+      }
+      $new_inv_data[$parent][] = $sub;        
+    }
+    echo json_encode(array("status" => TRUE, 'data' => $new_inv_data));
+    exit();
   }
   
   public function release_patient($record_id)

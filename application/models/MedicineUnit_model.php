@@ -1,22 +1,22 @@
 <?php
 
-class MedicineFormat_model extends CI_Model {
+class MedicineUnit_model extends CI_Model {
     
     public function __construct()
     {
         parent::__construct();
         $this->load->database();
-        $this->column_search = array('format_name', 'format_token', 'format_author', 'format_description');
+        $this->column_search = array('mu_name', 'mu_unit', 'mu_token', 'mu_author');
     }
     
-    public function get_all_formats()
+    public function get_all_units()
     {
-        $this->db->select('format_name as title, format_token as token');
-        $this->db->order_by('format_name', 'ASC');
-        return $this->db->get('medicine_formats')->result();
+        $this->db->select('mu_name as title, mu_unit as unit, mu_token as token');
+        $this->db->order_by('mu_name', 'ASC');
+        return $this->db->get('medicine_units')->result();
     }
     
-    public function get_formats($postData)
+    public function get_units($postData)
     {
         $this->_get_datatables_query($postData);
         if(isset($postData['length']) && $postData['length'] != -1){
@@ -28,8 +28,9 @@ class MedicineFormat_model extends CI_Model {
     
     private function _get_datatables_query($postData)
     {
-        $this->db->from('medicine_formats');
-        $this->db->order_by('format_name');
+        $this->db->select('mu_id as id, mu_name as name, mu_unit as unit, mu_token as token, mu_author as author, mu_created_at as createdAt');
+        $this->db->from('medicine_units');
+        $this->db->order_by('mu_token DESC', 'mu_name ASC');
         
         $i = 0;
         // loop searchable columns 
@@ -57,7 +58,7 @@ class MedicineFormat_model extends CI_Model {
     
     public function countAll()
     {
-        $this->db->from('medicine_formats');
+        $this->db->from('medicine_units');
         return $this->db->count_all_results();
     }
     
@@ -68,25 +69,25 @@ class MedicineFormat_model extends CI_Model {
         return $query->num_rows();
     }
     
-    public function checkFormatNameExist($title)
+    public function checkMedicineUnitExist($title, $unit)
     {
-        $this->db->where('format_name', $title);
-        $this->db->from('medicine_formats');
+        $this->db->where('mu_name', $title);
+        $this->db->where('mu_unit', $unit);
+        $query = $this->db->get('medicine_units');
+        return $query->num_rows() > 0;
+    }
+    
+    public function checkMedicineUnitTokenExist($token)
+    {
+        $this->db->where('mu_token', $token);
+        $this->db->from('medicine_units');
         $query = $this->db->get();
         return $query->num_rows() > 0;
     }
     
-    public function checkFormatTokenExist($token)
+    public function save_units($data)
     {
-        $this->db->where('format_token', $token);
-        $this->db->from('medicine_formats');
-        $query = $this->db->get();
-        return $query->num_rows() > 0;
-    }
-    
-    public function save_formats($data)
-    {
-        $this->db->insert('medicine_formats', $data);
+        $this->db->insert('medicine_units', $data);
     }
     
     public function get_format_by_token($token)

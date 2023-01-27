@@ -36,6 +36,12 @@ class E_reports extends CI_Controller {
 		return $age;
 	}
 
+	private function eligibleToResetRecord($record)
+	{
+		if($this->patient_model->eligibleToResetRecord($record)) return TRUE;
+		else return FALSE;
+	}
+
 	#######################################################################
 	################      PRIVATE METHODS ENDS ############################
 	#######################################################################
@@ -718,7 +724,7 @@ class E_reports extends CI_Controller {
 					// $kwanza_btn = '<a href="'.base_url('doctor/my-session').'" type="button" class="btn btn-sm btn-warning fw-bold" name="stop_kwanza" data-id="'.$r->rec_id.'" data-patient="'.$full_name.'" data-file="'.$r->rec_patient_file.'" data-visit="'.$r->vs_id.'"><i class="bi bi-exclamation-triangle me-1"></i>Pending</a>';
 					
 					$data[] = array(
-						$i,
+						// $i,
 						$name . ' <code>(' . $r->pat_file_no . ')</code>',
 						$receptionist,
 						// empty($receptionist) ? 'Waiting' : $receptionist . '<br /> <code>('.date("Y-m-d H:i:s a", strtotime($r->rec_regdate)).')</code>',
@@ -800,7 +806,7 @@ class E_reports extends CI_Controller {
 					$span = timespan($dateTime1, $unix_time_out, 1);
 					
 					$data[] = array(
-						$i,
+						// $i,
 						$name,
 						$r->pat_file_no,
 						$r->pat_phone,
@@ -837,6 +843,97 @@ class E_reports extends CI_Controller {
 						'subHeading' => 'Treated Patients',
 					);
 					$this->load->view('pages/e_reports/treated_patients', $data);					
+				} catch (\Throwable $th) {
+					$this->session->set_flashdata('error', $th->getMessage());
+					return redirect($_SERVER['HTTP_REFERER']);         
+				}
+			}
+			else
+			{
+				$this->session->set_flashdata('error', 'No access');
+				return redirect($_SERVER['HTTP_REFERER']);
+			}
+		}		
+	}
+	
+	public function incomplete_patients($header)
+	{
+		if($this->input->server('REQUEST_METHOD') === 'POST')
+		{
+			
+			if($this->session->userdata('user_isIncharge') || $this->session->userdata('user_role') == 'SUPER' || $this->session->userdata('user_role') == 'ADMIN')
+			{
+				$data = [];
+				
+				$draw = intval($this->input->post("draw"));
+				$start = intval($this->input->post("start"));
+				$length = intval($this->input->post("length"));
+				
+				$result = $this->patient_model->get_incomplete_patients($this->input->post());
+				
+				$i = $this->input->post("start");
+				foreach($result as $r)
+				{
+					$i++;
+					$name = empty($r->pat_mname) ? $r->pat_lname . ', ' . $r->pat_fname : $r->pat_lname . ', ' . $r->pat_fname . ' ' . $r->pat_mname[0] . '.';			
+					$time_in = date('Y-m-d H:i', strtotime($r->pat_regdate));
+					
+					$f_point = '<a class="text-danger">';
+					if(empty($r->vs_visit))
+					{
+						$f_point .= 'Reception';
+					}
+					else
+					{
+						$text = $r->vs_visit;						
+						if($text == 'nasubiri_daktari' || $text == 'nimerudishwa_kutoka_ph' || $text == 'nimetoka_lab' || $text == 'nimerudishwa_kutoka_lab' || $text == 'nipo_daktari_1' || $text == 'nipo_daktari_1r' || $text == 'nipo_daktari_2' || $text == 'nipo_daktari_2r') $f_point .= 'Doctor';
+
+						else if($text == 'nimetoka_daktari' || $text == 'nimetoka_daktari_r' || $text == 'nipo_ph') $f_point .= 'Pharmacy';
+
+						else $f_point .= 'Lab';
+					}
+					$f_point .= '</a>';
+
+					$option = '<a href="#" name="resetIncomplete" data-id="'.$r->rec_id.'" class="text-primary">Reset</a>';
+					
+					$data[] = array(
+						// $i,
+						$name,
+						$r->pat_file_no,
+						$r->pat_phone,
+						$r->pat_occupation,
+						$time_in,
+						$f_point,
+						$option,
+						$r->pat_address,
+						$r->pat_gender[0],
+						$r->pat_em_name . ' (' .$r->pat_em_number . ')',
+					);
+				}
+				
+				$result = array(
+					"draw" => $draw,
+					"recordsTotal" => $this->patient_model->countAllIncompletePatients(),
+					"recordsFiltered" => $this->patient_model->countFilteredAllIncompletePatients($this->input->get()),
+					"data" => $data
+				);
+				
+				echo json_encode($result);
+				exit();
+			}
+		}
+		else
+		{
+			if($this->session->userdata('user_isIncharge') || $this->session->userdata('user_role') == 'SUPER' || $this->session->userdata('user_role') == 'ADMIN')
+			{
+				try {
+					$data = array(
+						'title' => 'Incomplete Patients',
+						'header' => @$header,
+						'heading' => 'Pro',
+						'subHeading' => 'Incomplete Patients',
+					);
+					$this->load->view('pages/e_reports/incomplete_patients', $data);					
 				} catch (\Throwable $th) {
 					$this->session->set_flashdata('error', $th->getMessage());
 					return redirect($_SERVER['HTTP_REFERER']);         
@@ -930,6 +1027,33 @@ class E_reports extends CI_Controller {
 			exit();      
 		}
 		
+	}
+	
+	public function reset_incomplete_patient($record)
+    {
+		try {
+			$record = $this->security->xss_clean($record);
+			if(!$this->eligibleToResetRecord($record))
+			{
+				echo json_encode(array("status" => FALSE, 'data' => '<code>Action not allowed</code>'));
+				exit();
+			}
+			else
+			{
+				$symptomTable = $this->patient_model->symptoms_data_by_record_id($record);
+				$visitTable = $this->patient_model->visit_data_by_recordId($record);
+				
+				$this->patient_model->deleteById('patient_record', 'rec_id', $record);
+				if(!empty($symptomTable)) $this->patient_model->deleteById('patient_symptoms', 'sy_id', $symptomTable['sy_id']);
+				if(!empty($visitTable)) $this->patient_model->deleteById('patient_visit', 'vs_id', $visitTable['vs_id']);
+
+				echo json_encode(array("status" => TRUE, 'data' => '<code>Success</code>'));
+				exit();
+			}
+		} catch (\Throwable $th) {
+			echo json_encode(array("status" => FALSE, 'data' => $th->getMessage()));
+			exit();      
+		}
 	}
 	
 }

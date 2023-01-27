@@ -11,31 +11,31 @@ $csrf = array(
       <div class="collapse" id="addNameCollapse">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title"> Medicine names registration form</h5>
+            <h5 class="card-title"> Medicine registration form</h5>
             <form class="row g-3" method="post" action="javascript:void(0);" id="names_form">
               <input type="hidden" name="<?php echo $csrf['name'];?>" value="<?php echo $csrf['hash'];?>" />
               <div class="col-md-12">
-                <input type="text" name="name" id="name" class="form-control" placeholder="Medicine name - in generic name" />
+                <input type="text" name="name" id="name" class="form-control" placeholder="Medicine name" />
               </div>
               <div class="col-md-6">
-                <input type="text" name="slag" id="slag" class="form-control" placeholder="Medicine slag" />
+                <input type="text" name="slag" id="slag" class="form-control" placeholder="Other name" />
               </div>
               <div class="col-md-6">
-                <input type="text" name="token" id="token" class="form-control numberonly" placeholder="Medicine token" />
+                <input type="text" name="token" id="token" class="form-control numberonly" placeholder="Token - (consider the next to last token)" />
               </div>
               <div class="col-md-12">
                 <select name="category" id="category" class="form-select">
                   <option selected> Choose category...</option>
                   <?php foreach ($categories as $row) { ?>
-                    <option value="<?php echo $row->token;?>"><?php echo $row->title;?></option>
+                    <option value="<?php echo $row->token;?>"><?php echo strtoupper($row->title);?></option>
                   <?php } ?>
                 </select>
               </div>
               <div class="col-md-12">
                 <select name="format" id="format" class="form-select">
-                  <option selected> Choose format...</option>
+                  <option selected> Choose form...</option>
                   <?php foreach ($formats as $row) { ?>
-                    <option value="<?php echo $row->token;?>"><?php echo $row->title;?></option>
+                    <option value="<?php echo $row->token;?>"><?php echo strtoupper($row->title);?></option>
                   <?php } ?>
                 </select>
               </div>
@@ -56,22 +56,23 @@ $csrf = array(
       <div class="card">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center">
-            <h5 class="card-title">List of medicine generic names</h5>
+            <h5 class="card-title">A list of medicines</h5>
             <button type="button" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#addNameCollapse">
-              <i class="bi bi-plus-circle me-1"></i> Add Name
+              <i class="bi bi-plus-circle me-1"></i> Add Medicine
             </button>
           </div>
           
           <table id="table_names" class="table table-striped table-sm nowrap"  style="width:100%">
             <thead>
               <tr>
-                <th scope="col">#</th>
                 <th scope="col">Name</th>
+                <th scope="col">Other Name</th>
                 <th scope="col">Token</th>
                 <th scope="col">Category</th>
-                <th scope="col">Format</th>
+                <th scope="col">Form</th>
                 <th scope="col">State</th>
-                <th scope="col">Date Created</th>
+                <th scope="col">Option</th>
+                <th scope="col">Date Added</th>
                 <th scope="col">Author</th>
                 <th scope="col">Decsription</th>
               </tr>
@@ -79,7 +80,6 @@ $csrf = array(
             <tbody>
             </tbody>
           </table>
-          
         </div>
       </div>
       
@@ -102,7 +102,7 @@ $csrf = array(
     // Medicine categories on page load with datatable jquery library
     const title = '<?php echo $title; ?>';
     const header = '<?php echo $header; ?>';
-    const messageTop = `${header} | List of Medicine Generic Names`;
+    const messageTop = `${header} | Medicine list`;
     var table_names = $('#table_names').DataTable({
       oLanguage: {
         sProcessing: "loading...",      
@@ -152,7 +152,6 @@ $csrf = array(
       },
       ],
     });
-    
     
     $("#names_form").validate({
   errorPlacement: function(error, element) {
@@ -300,8 +299,7 @@ $csrf = array(
                     });
                   },
                 });
-              });
-              
+              });              
             }
           }
         });

@@ -174,7 +174,7 @@ $("#client-report-form").validate({
                                           var str = '';
                                           $.each(data, function(key, value){
                                                 str += '<div class="col-md-6"><div class="card"><div class="card-body">';
-                                                str += '<h5 class="card-title">' + value.full_name + ' (' + value.pf + ') | <code>' + value.day + '</code></h5>';
+                                                str += '<h5 class="card-title">' + value.full_name + ' (' + value.pf + ') <span>| ' + value.day + '</span></h5>';
                                                 str += '<ol class="list-group list-group-numbered">';
                                                 $.each(value.diagnosis, function(key2, val){
                                                       str += '<li class="list-group-item">';

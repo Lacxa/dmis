@@ -7,19 +7,16 @@
 			<div class="card recent-sales overflow-auto">
 				<div class="card-body">
 					<h5 class="card-title">
-						Stock Status <span>| All posted batches</span>
+						Sign In History <span>| Recent 50</span>
 					</h5>
-          <table class="table table-borderless table-sm nowrap" id="table_stock_status">
+          <table class="table table-borderless table-sm nowrap" id="table_login_history">
             <thead>
               <tr>
                 <th scope="col">#</th>
-                <th scope="col">Stock</th>
-                <th scope="col">Category</th>
-                <th scope="col">Form</th>
-                <th scope="col">Unit</th>
-                <!-- <th scope="col">Intial</th> -->
-                <th scope="col">Available</th>
-                <th scope="col">Status</th>
+                <th scope="col">IP Address</th>
+                <th scope="col">Platform</th>
+                <th scope="col">Browser</th>
+                <th scope="col">Time</th>
               </tr>
             </thead>
             <tbody></tbody>
@@ -37,8 +34,8 @@
 <script type="text/javascript">
 	$(function() {
 		const title = '<?php echo $title; ?>';
-		const messageTop = `Stock status`;
-		var table_stock_status = $('#table_stock_status').DataTable({
+		const messageTop = `Sign In History`;
+		var table_login_history = $('#table_login_history').DataTable({
 			oLanguage: {
 			sProcessing: "loading...",
 			sLengthMenu: 'Show <select class="form-select">'+
@@ -54,7 +51,7 @@
 		"serverSide":true,
 		"order":[],
 		"ajax": {
-			url : "<?php echo base_url('pharmacy/stock-status');?>",
+			url : "<?php echo base_url('home/sign-in-history/'.@$header);?>",
      		 type : 'POST'
 			},
 			"ordering": false,

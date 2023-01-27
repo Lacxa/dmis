@@ -46,13 +46,14 @@ $csrf = array(
           </div>
           <?php foreach($prescriptions as $key => $row) { 
             $query = '+++';
-            if(substr($row->text, 0, strlen($query)) === $query || $row->in == 0) {
+            if(substr($row->text, 0, strlen($query)) === $query || $row->in == 0){
               $text = str_replace($query,'', $row->text); ?>
               <ul class="list-group">
                 <li class="list-group-item">
                   <?php if($row->in == 1) {
                     echo '<i class="bi bi-capsule me-1 text-primary"></i>';
-                    echo $row->medicine_name. ' ('.$row->title. ' | '.$row->grand. ' | '.$row->parent.')'; echo $text == 'null' ? '' : ': '.$text;
+                    echo $row->medicine1. ' ('.$row->form. ' | '.$row->category. ' | '.$row->unit_title.': '.$row->unit_value.'&nbsp;'.$row->unit_name.')';
+                    echo $text == 'null' ? '' : ': '.$text;
                   } else {
                     echo '<i class="bi bi-capsule me-1 text-danger"></i>';
                     echo $text;
@@ -78,33 +79,33 @@ $csrf = array(
                 </div>
 
                 <div class="col-md-9 input-col-1">
-                 <div class="input-group mb-3">
-                  <span class="input-group-text"><?php echo $row->medicine_name. ' ('.$row->title. ' | '.$row->grand. ' | '.$row->parent.')'; echo $row->text == 'null' ? '' : ': '.$row->text; ?></span>
-                  <input type="number" name="count" class="form-control numberonly" min="1" max="<?php echo $max;?>">
-                  <span class="input-group-text"><?php echo $max;?></span>
+                  <div class="input-group mb-3">
+                    <span class="input-group-text">
+                      <?php echo $row->medicine1. ' ('.$row->form. ' | '.$row->category. ' | '.$row->unit_title.': '.$row->unit_value.'&nbsp;'.$row->unit_name.')';
+                      echo $row->text == 'null' ? '' : ': '.$row->text; ?>                  
+                      </span>
+                      <input type="number" name="count" class="form-control numberonly" min="1" max="<?php echo $max;?>">
+                      <span class="input-group-text"><?php echo $max;?></span>
+                  </div>
+                  <div class="invalid-feedback"></div>
                 </div>
-                <div class="invalid-feedback"></div>
-              </div>
 
-              <div class="col-md-9 input-col-2" style="display: none;">
-               <div class="input-group mb-3">
-                <span class="input-group-text">#</span>
-                <input name="text" type="text" value="<?php echo $row->medicine_name. ' ('.$row->title. ' | '.$row->grand. ' | '.$row->parent.'): '.$row->text; ?>" class="form-control" readonly>
-              </div>
-            </div>
-
-            <div class="col-md-1">
-              <button data-catId="" name="save-btn" class="btn btn-primary">Save</button>
-            </div>
-          </form>
-        <?php } }?>
-
+                <div class="col-md-9 input-col-2" style="display: none;">
+                  <div class="input-group mb-3">
+                    <span class="input-group-text">#</span>
+                    <input name="text" type="text" value="<?php echo $row->medicine1. ' ('.$row->form. ' | '.$row->category. ' | '.$row->unit_title.': '.$row->unit_value.'&nbsp;'.$row->unit_name.'): '.$row->text; ?>" class="form-control" readonly>
+                  </div>
+                </div>
+                <div class="col-md-1">
+                  <button data-catId="" name="save-btn" class="btn btn-primary">Save</button>
+                </div>
+              </form>
+            <?php } }?>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-
-</div>
-</section>
+  </section>
 <?php $this->load->view('templates/base_footer.php'); ?>
 
 <script type="text/javascript">

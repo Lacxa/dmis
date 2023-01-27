@@ -38,7 +38,7 @@
   <script src="<?php echo base_url('assets/js/datatable/responsive.bootstrap.min.js');?>"></script>
 
   <!-- Bootbox JS File -->
-  <script src="<?php echo base_url('assets/js/bootbox.js'); ?>"></script>
+  <script src="<?php echo base_url('assets/js/bootbox/bootbox.all.js'); ?>"></script>
 
   <!-- jquery validate library -->
   <script src="<?php echo base_url('assets/js/jquery.validate.js');?>"></script>
@@ -49,22 +49,14 @@
   
   <script type="text/javascript">
     $(function() {
-    
-    $.ajaxSetup({
-      data: {
-        '<?php echo $this->security->get_csrf_token_name(); ?>' : '<?php echo $this->security->get_csrf_hash(); ?>'
-      }
-    });
-
-  });
-
-  </script>
-
-  <?php if($this->session->userdata('user_role') == 'MO') { ?>
-
-    <script type="text/javascript">
-
-      $(function() {
+      
+      $.ajaxSetup({
+        data: {
+          '<?php echo $this->security->get_csrf_token_name(); ?>' : '<?php echo $this->security->get_csrf_hash(); ?>'
+        }
+      });
+      
+      <?php if($this->session->userdata('user_role') == 'MO') { ?>
         function session_counter(){
           $.ajax({
             url: "<?php echo base_url('doctor/ajax-count-session-patients'); ?>",
@@ -87,10 +79,58 @@
         setInterval(function(){
           session_counter();
         }, 6000);
-      });
+        <?php } else if($this->session->userdata('user_role') == 'PH') { ?>
+          function prescription_counter(){
+            $.ajax({
+              url: "<?php echo base_url('pharmacy/ajax-count-prescription'); ?>",
+              type: "POST",
+              dataType: "json",
+              success: function (response) {
+                if(response.status){
+                  const res = response.data;
+                  if(res > 0){
+                    $('.prescription-counter').text(res);
+                  }else{
+                    $('.prescription-counter').text("");
+                  }
+                }
+              }
+            });
+        }
 
-    </script>
-  <?php } ?>
+        prescription_counter();
+        setInterval(function(){
+          prescription_counter();
+        }, 7000);        
+          <?php } else if($this->session->userdata('user_role') == 'LAB') { ?>
+            function lab_patients_counter(){
+              $.ajax({
+                url: "<?php echo base_url('lab/ajax-count-patients'); ?>",
+                type: "POST",
+                dataType: "json",
+                success: function (response) {
+                  if(response.status){
+                    const res = response.data;
+                    if(res > 0){
+                      $('.patients-counter').text(res);
+                    }else{
+                      $('.patients-counter').text("");
+                    }
+                  }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                  // console.log(jqXHR);
+                }
+              });
+          }
+
+          lab_patients_counter();
+          setInterval(function(){
+            lab_patients_counter();
+          }, 7000);        
+          <?php } ?>
+      });
+  </script>
 
 </body>
 

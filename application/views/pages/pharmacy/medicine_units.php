@@ -8,23 +8,23 @@ $csrf = array(
   <div class="row">
     
   <div class="col-lg-12">
-      <div class="collapse" id="addFormatCollapse">
+      <div class="collapse" id="addUnitCollapse">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title"> Medicine forms registration form</h5>
-            <form class="row g-3" method="post" action="javascript:void(0);" id="format_form">
+            <h5 class="card-title"> Medicine units/dosage registration form</h5>
+            <form class="row g-3" method="post" action="javascript:void(0);" id="units_form">
               <input type="hidden" name="<?php echo $csrf['name'];?>" value="<?php echo $csrf['hash'];?>" />
-              <div class="col-6">
-              <label for="title" class="form-label">Format Name</label>
-                <input type="text" name="title" id="title" class="form-control"/>
-              </div>
-              <div class="col-6">
-              <label for="token" class="form-label">Token</label>
-                <input type="text" name="token" id="token" class="form-control numberonly" />
-              </div>
               <div class="col-md-12">
-              <label for="desc" class="form-label">Description</label>
-                <textarea name="desc" id="desc" class="form-control"> </textarea>
+              <label for="title" class="form-label">Title</label>
+                <input type="text" name="title" id="title" placeholder="eg. mass, volume, etc." class="form-control"/>
+              </div>
+              <div class="col-md-6">
+                <label for="token" class="form-label">Unit</label>
+                <input type="text" name="unit" id="unit" placeholder="eg. mg, g, ml, etc." class="form-control" />
+              </div>
+              <div class="col-md-6">
+                <label for="token" class="form-label">Token</label>
+                <input type="text" name="token" id="token" placeholder="start next to last token" class="form-control numberonly" />
               </div>
               <div class="text-center">
                 <button type="submit" class="btn btn-primary">Submit</button>
@@ -40,21 +40,21 @@ $csrf = array(
       <div class="card">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center">
-            <h5 class="card-title">List of medicine forms</h5>
-            <button type="button" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#addFormatCollapse">
+            <h5 class="card-title">List of medicine units/dosage</h5>
+            <button type="button" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#addUnitCollapse">
               <i class="bi bi-plus-circle me-1"></i> Add New
             </button>
           </div>
           
-          <table id="table_formats" class="table table-striped table-sm nowrap"  style="width:100%">
+          <table id="table_units" class="table table-striped table-sm nowrap"  style="width:100%">
             <thead>
               <tr>
                 <th scope="col">#</th>
                 <th scope="col">Name</th>
+                <th scope="col">Unit</th>
                 <th scope="col">Token</th>
-                <th scope="col">Date Created</th>
                 <th scope="col">Author</th>
-                <th scope="col">Decsription</th>
+                <th scope="col">Date Created</th>
               </tr>
             </thead>
             <tbody>
@@ -83,8 +83,8 @@ $csrf = array(
   // Medicine categories on page load with datatable jquery library
   const title = '<?php echo $title; ?>';
   const header = '<?php echo $header; ?>';
-  const messageTop = `${header} | List of Medicine forms`;
-  var table_formats = $('#table_formats').DataTable({
+  const messageTop = `${header} | List of medicine units`;
+  var table_units = $('#table_units').DataTable({
     oLanguage: {
       sProcessing: "loading...",      
       sLengthMenu: 'Show <select class="form-select">'+
@@ -100,7 +100,7 @@ $csrf = array(
     "serverSide":true,
     "order":[],
     "ajax": {
-      url : "<?php echo base_url('pharmacy/medicine-formats');?>",
+      url : "<?php echo base_url('pharmacy/medicine-units');?>",
       type : 'POST'
     },
     "ordering": false,
@@ -135,13 +135,14 @@ $csrf = array(
   });
 
 
-$("#format_form").validate({
+$("#units_form").validate({
   debug: false,
   errorClass: "text-danger",
   errorElement: "span",
   rules: { 
     token: { required: true, number: true },
     title: { required: true },
+    unit: { required: true },
   },
   messages: {},
   highlight: function(element, errorClass) {
@@ -155,18 +156,18 @@ $("#format_form").validate({
       closeButton: false,
     })
     .on("shown.bs.modal", function () {
-      var formdata = $("#format_form").serialize();
+      var formdata = $("#units_form").serialize();
       $.ajax({
-        url: '<?php echo base_url('pharmacy/save-medicine-formats');?>',
+        url: '<?php echo base_url('pharmacy/save-medicine-units');?>',
         type: "POST",
         data: formdata,
         dataType: "JSON",
         success: function (response) {
-          table_formats.ajax.reload();
           if (response.status) {
             bootbox.alert(response.data.toString(), function () {
-            $("#format_form")[0].reset();
-            $('#addFormatCollapse').collapse('hide');
+              $("#units_form")[0].reset();
+              $('#addUnitCollapse').collapse('hide');
+              table_units.ajax.reload();
               dialog.modal("hide");
             });
           } else {
@@ -180,6 +181,7 @@ $("#format_form").validate({
             dialog.modal("hide");
           });
         },
+        timeout: 10000
       });
     });
   },

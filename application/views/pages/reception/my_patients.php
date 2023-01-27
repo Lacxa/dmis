@@ -59,7 +59,7 @@ $csrf = array(
                 <div class="col-md-6" style="display: none;">
                   <div class="input-group mb-3">
                     <span class="input-group-text" id="basic-addon1">ID</span>
-                    <input type="number" id="record_id" name="record_id" class="form-control" aria-label="Record ID" aria-describedby="basic-addon1">
+                    <input type="text" id="record_id" name="record_id" class="form-control" aria-label="Record ID" aria-describedby="basic-addon1">
                   </div>
                 </div>
 
@@ -292,7 +292,7 @@ $("#preliminaries").validate({
   validClass: "is-valid",
   errorElement: "div",
   rules: { 
-    record_id: { required: true, number: true },
+    record_id: { required: true },
     patient_file: { required: true },
     blood_pressure: { required: true },
     pulse_rate: { required: true, range: [40, 171] },
