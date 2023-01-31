@@ -19,7 +19,7 @@ class E_reports extends CI_Controller {
 	#######################################################################
 	################      PRIVATE METHODS STARTS ##########################
 	#######################################################################
-		
+	
 	private function get_employee_by_file_number($file_number)
 	{
 		$data = $this->employee_model->get_employee_by_file_number($file_number);
@@ -29,10 +29,10 @@ class E_reports extends CI_Controller {
 
 	private function compute_age($dob)
 	{
-        $date1 = date_create(date("Y-m-d", strtotime($dob)));
-        $date2 = date_create(date("Y-m-d"));        
-        $diff = date_diff($date1, $date2);
-        $age = abs($diff->format("%Y"));
+		$date1 = date_create(date("Y-m-d", strtotime($dob)));
+		$date2 = date_create(date("Y-m-d"));        
+		$diff = date_diff($date1, $date2);
+		$age = abs($diff->format("%Y"));
 		return $age;
 	}
 
@@ -40,6 +40,36 @@ class E_reports extends CI_Controller {
 	{
 		if($this->patient_model->eligibleToResetRecord($record)) return TRUE;
 		else return FALSE;
+	}
+
+	private function formatSizeUnits($bytes)
+	{
+		if ($bytes >= 1073741824)
+		{
+			$bytes = number_format($bytes / 1073741824, 2) . ' GB';
+		}
+		elseif ($bytes >= 1048576)
+		{
+			$bytes = number_format($bytes / 1048576, 2) . ' MB';
+		}
+		elseif ($bytes >= 1024)
+		{
+			$bytes = number_format($bytes / 1024, 2) . ' KB';
+		}
+		elseif ($bytes > 1)
+		{
+			$bytes = $bytes . ' bytes';
+		}
+		elseif ($bytes == 1)
+		{
+			$bytes = $bytes . ' byte';
+		}
+		else
+		{
+			$bytes = '0 bytes';
+		}
+
+		return $bytes;
 	}
 
 	#######################################################################
@@ -1030,7 +1060,7 @@ class E_reports extends CI_Controller {
 	}
 	
 	public function reset_incomplete_patient($record)
-    {
+	{
 		try {
 			$record = $this->security->xss_clean($record);
 			if(!$this->eligibleToResetRecord($record))
@@ -1054,6 +1084,91 @@ class E_reports extends CI_Controller {
 			echo json_encode(array("status" => FALSE, 'data' => $th->getMessage()));
 			exit();      
 		}
+	}
+	
+	public function database_backup($header)
+	{
+		if($this->session->userdata('user_isIncharge') || $this->session->userdata('user_role') == 'SUPER' || $this->session->userdata('user_role') == 'ADMIN')
+		{
+			if($this->input->server('REQUEST_METHOD') === 'POST')
+			{
+				$db_table = $this->employee_model->get_db_backup();
+
+				$backup_file = 'DB File';
+				$html = '';
+				$html .= "<tr>";
+				$html .= "<td><code>".$db_table->file_name."</code></td>";
+				$html .= "<td>".$db_table->size." (compressed)</td>";
+				$html .= "<td>".$db_table->day."</td>";
+				$html .= "<td>".$db_table->author."</td>";
+				$html .= '<td><a type="button" href="' . base_url('reports/download-db-backup') . '" class="btn btn-primary" name="download"><i class="bi bi-save me-1"></i> Download</a>&nbsp;<a type="button" href="#" class="btn btn-primary" name="backup"><i class="bi bi-cloud-arrow-down me-1"></i> Backup</a></td>';
+				$html .= "</tr>";
+				
+				echo json_encode($html);
+				exit();
+			}
+			else
+			{
+				$data = array(
+					'title' => 'Database Backup',
+					'header' => @$header,
+					'heading' => 'Pro',
+					'subHeading' => 'Database Backup',
+				);
+				$this->load->view('pages/e_reports/db_backup', $data);
+			}
+		}		
+	}
+
+	public function start_database_backup()
+	{
+		if($this->session->userdata('user_isIncharge') || $this->session->userdata('user_role') == 'SUPER' || $this->session->userdata('user_role') == 'ADMIN')
+		{
+			try{
+				$this->load->helper('file');
+				$this->load->dbutil();
+				$preferences = array(
+					'format' => 'zip',
+					'filename' => 'DMIS-Database-Backup_' . date('Y-m-d_H-i')
+				);
+				$backup = $this->dbutil->backup($preferences);
+				$backup_name = 'DMIS-Database-Backup' . '.zip';
+				$backup_path = FCPATH.'uploads/db-backup/' . $backup_name;
+				if (!write_file($backup_path, $backup))
+				{
+					echo json_encode(array("status" => FALSE, 'data' => '<code>Error</code>'));
+					exit();
+				}
+				else
+				{
+					clearstatcache();
+					$size = filesize($backup_path);
+					if($size != FALSE) $size = $this->formatSizeUnits($size);
+
+					$data = array(
+						'db_id' => 1,
+						'db_file' => $backup_name,
+						'db_size' => $size,
+						'db_author' => $this->session->userdata('user_pf'),
+					);
+					$this->employee_model->update_db_backup($data);
+					
+					echo json_encode(array("status" => TRUE, 'data' => '<span class="text-success">Success</span>'));
+					exit();
+				}
+			}
+			catch (\Throwable $th) {
+				echo json_encode(array("status" => FALSE, 'data' => $th->getMessage()));
+				exit();      
+			}
+		}
+	}
+
+	public function download_database_backup()
+	{
+		$this->load->helper('download');
+		$backup_path = FCPATH.'uploads/db-backup/DMIS-Database-Backup' . '.zip';
+		force_download($backup_path, NULL);
 	}
 	
 }

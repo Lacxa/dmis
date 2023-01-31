@@ -52,7 +52,7 @@ class Pharmacy extends CI_Controller {
         
         $diff = date_diff($date1, $date2);
         $days = abs($diff->format("%R%a"));       
-        if($days >= 90) return redirect(base_url('password/expired/0'), 'refresh');
+        if($days >= 90) return redirect(base_url('password/change/0/'.@$this->header), 'refresh');
         
     }
     
@@ -821,7 +821,7 @@ public function medicine_state($state, $id)
 
 public function stock_register_get($record=0)
 {
-    $recordPerPage = 5;
+    $recordPerPage = 6;
 	if($record != 0)
     {
         $record = ($record-1) * $recordPerPage;
@@ -829,7 +829,7 @@ public function stock_register_get($record=0)
 
     $recordCount = $this->stock_model->getStockCount();
     $stockRecord = $this->stock_model->get_stock($record,$recordPerPage);
-    $config['base_url'] = base_url().'pharmacy/get-stock-register';
+    $config['base_url'] = base_url().'pharmacy/get-stock-register/'.$record;
     $config['use_page_numbers'] = TRUE;
     $config['next_link'] = 'Next';
     $config['prev_link'] = 'Previous';
@@ -1784,6 +1784,59 @@ public function release_patient($record_id)
     } catch (\Throwable $th) {
         $this->session->set_flashdata('error', $th->getMessage());
         return redirect(base_url('pharmacy/patient-results-get/'.$record_id));     
+    }
+}
+
+public function patient_history($patient_id, $record=0)
+{
+    $patient = $this->security->xss_clean($patient_id);
+    $patient_data = $this->patient_model->get_patient_by_id($patient);
+    if(empty($patient_data))
+    {
+        echo json_encode(array("status" => FALSE, 'data' => '<code>No such record</code>'));
+        exit();
+    }
+    else
+    {    
+        $recordPerPage = 6;
+        if($record != 0)
+        {
+            $record = ($record-1) * $recordPerPage;
+        }
+        $recordCount = $this->patient_model->patient_history_ph_count($patient);
+        $results = $this->patient_model->patient_history_ph($record, $recordPerPage, $patient);
+        $config['base_url'] = base_url().'pharmacy/patient-history/'.$patient.'/'.$record;
+        $config['use_page_numbers'] = TRUE;
+        $config['next_link'] = 'Next';
+        $config['prev_link'] = 'Previous';
+        $config['total_rows'] = $recordCount;
+        $config['per_page'] = $recordPerPage;
+        $config['num_links'] = 5;
+        
+        $config['full_tag_open'] = '<ul class="pagination justify-content-center mt-2">';        
+        $config['full_tag_close'] = '</ul>';        
+        $config['first_link'] = 'First';        
+        $config['last_link'] = 'Last';        
+        $config['first_tag_open'] = '<li class="page-item"><span class="page-link">';        
+        $config['first_tag_close'] = '</span></li>';        
+        $config['prev_link'] = '&laquo';        
+        $config['prev_tag_open'] = '<li class="page-item"><span class="page-link">';        
+        $config['prev_tag_close'] = '</span></li>';        
+        $config['next_link'] = '&raquo';        
+        $config['next_tag_open'] = '<li class="page-item"><span class="page-link">';        
+        $config['next_tag_close'] = '</span></li>';        
+        $config['last_tag_open'] = '<li class="page-item"><span class="page-link">';        
+        $config['last_tag_close'] = '</span></li>';        
+        $config['cur_tag_open'] = '<li class="page-item active"><a class="page-link" href="#">';        
+        $config['cur_tag_close'] = '</a></li>';        
+        $config['num_tag_open'] = '<li class="page-item"><span class="page-link">';        
+        $config['num_tag_close'] = '</span></li>';
+        
+        $this->pagination->initialize($config);
+        $data['pagination'] = $this->pagination->create_links();
+        $data['historyData'] = $results;
+        echo json_encode(array("status" => TRUE, 'data' => $data));
+        exit();
     }
 }
 

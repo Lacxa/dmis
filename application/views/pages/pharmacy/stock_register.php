@@ -12,8 +12,7 @@ $csrf = array(
 				<div class="card">
 					<div class="card-body">
 						<h5 class="card-title">
-							Stock Management Area<br />
-							<code>Select the relevant action</code>
+							Stock management section <span>| Choose action</span>
 						</h5>
 						<div class="col-12">
 							<select id="action_input" class="form-select">
@@ -193,7 +192,7 @@ $csrf = array(
 						headerArray.push(elementID);
 					}
 				});
-				
+								
 				html += '<div class="accordion" id="stockAccordion">';
 				$.each(data, function(key, value){
 					const active = value.state == 0 ? '<span class="badge bg-danger">Draft</span>': '';

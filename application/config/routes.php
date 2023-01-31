@@ -152,6 +152,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     $route['doctor/reports'] = 'doctor/reports';
     $route['doctor/search-patient'] = 'doctor/search_patient';
     $route['doctor/patient-history'] = 'doctor/patient_history';
+    $route['doctor/client-history/(:any)/(:any)'] = 'doctor/patient_history_2/$1/$2';
     $route['doctor/search-medicines']['post'] = 'doctor/search_medicines';
     $route['doctor/lab-diagnostics'] = 'doctor/lab_diagnostics';
     $route['doctor/edit-investigations'] = 'doctor/edit_investigations';
@@ -172,6 +173,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     $route['lab/reports'] = 'lab/reports';
     $route['lab/search-patient'] = 'lab/search_patient';
     $route['lab/patient-history'] = 'lab/patient_history';
+    $route['lab/client-history/(:any)/(:any)'] = 'lab/patient_history_2/$1/$2';
     $route['lab/lab-diagnostics'] = 'lab/lab_diagnostics';
     $route['lab/ajax-count-patients'] = 'lab/ajax_count_patients';
     
@@ -187,6 +189,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     $route['reports/incomplete-patients/(:any)'] = "e_reports/incomplete_patients/$1";
     $route['reports/incomplete-patients/reset/(:any)']['post'] = "e_reports/reset_incomplete_patient/$1";
     $route['reports/dashboard/count-patients/(:num)']['post'] = "e_reports/count_patients/$1";
+    $route['reports/db-backup/(:any)'] = "e_reports/database_backup/$1";
+    $route['reports/start-db-backup'] = "e_reports/start_database_backup/$1";
+    $route['reports/download-db-backup'] = "e_reports/download_database_backup";
     
     // Pharmacy routes
     $route['pharmacy'] = 'pharmacy';
@@ -196,6 +201,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     $route['pharmacy/return-patient/(:any)']['get'] = 'pharmacy/return_patient/$1';
     $route['pharmacy/save-prescriptions/(:any)']['post'] = 'pharmacy/save_prescriptions/$1';
     $route['pharmacy/release-patient/(:any)']['get'] = 'pharmacy/release_patient/$1';
+    $route['pharmacy/patient-history/(:any)/(:any)'] = 'pharmacy/patient_history/$1/$2';
     $route['pharmacy/stock-register'] = 'pharmacy/stock_register';
     $route['pharmacy/get-stock-register/(:any)'] = 'pharmacy/stock_register_get/$1';
     $route['pharmacy/stock-register/create-new-batch']['post'] = 'pharmacy/create_new_batch';

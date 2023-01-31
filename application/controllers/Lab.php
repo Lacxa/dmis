@@ -2,7 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Lab extends CI_Controller {
-  
+
   public $mainTitle = null;
   public $header = null;
   
@@ -13,7 +13,7 @@ class Lab extends CI_Controller {
     $this->load->model(array("employee_model", "patient_model", "investigation_model"));
     $this->mainTitle  = 'DMIS | LAB';
     $this->header = 'Laboratory';
-    $this->load->library(array("form_validation", "session"));
+    $this->load->library(array("form_validation", "session", "pagination"));
     $this->load->helper(array("url", "html", "form", "security", "date"));
     $this->form_validation->set_error_delimiters('<div class="text-danger">', '</div>');
     
@@ -173,8 +173,8 @@ class Lab extends CI_Controller {
 
   public function ajax_count_patients()
   {
-      echo json_encode(array("status" => TRUE, 'data' => $this->patient_model->countAllForLab()));
-      exit();
+    echo json_encode(array("status" => TRUE, 'data' => $this->patient_model->countAllForLab()));
+    exit();
   }
   
   public function my_patients()
@@ -324,7 +324,7 @@ class Lab extends CI_Controller {
         
         $inv_data = $this->patient_model->get_patient_lab_results_short($record);
         $current_inv = $inv_data['sy_investigations'];
-      
+
         $results = str_replace('^^', '', $results);
         $results = str_replace('$$$', '', $results);
         $results = str_replace('@text', '', $results);
@@ -343,7 +343,7 @@ class Lab extends CI_Controller {
 
         $formatted_string = $investigation . '~' . $results . '&&' . $file;
         $new_inv = str_replace($investigation.'~null', $formatted_string, $current_inv);
-      
+
         $data = array(
           'sy_investigations' => $new_inv,
         );
@@ -370,7 +370,7 @@ class Lab extends CI_Controller {
     else
     {
       $current_inv = $inv_data['sy_investigations'];
-  
+
       $explode = explode("^^", $current_inv);
       $myArray = [];
       foreach ($explode as $key => $value)
@@ -391,7 +391,7 @@ class Lab extends CI_Controller {
         'sy_investigations' => $myArray,
       );
       $this->patient_model->update_ivestigations($data, $inv_data['sy_id']);
-  
+
       echo json_encode(array("status" => TRUE, 'data' => '<code>Success</code>'));
       exit();
     }
@@ -580,45 +580,99 @@ class Lab extends CI_Controller {
         $this->form_validation->set_rules('pf', 'File Number', 'trim|required|exact_length[11]');
         $this->form_validation->set_rules('start', 'Start Date', 'trim|required');
         $this->form_validation->set_rules('end', 'End Date', 'trim|required');
-      
-      if ($this->form_validation->run() == FALSE)
-      {
-        echo json_encode(array("status" => FALSE, 'data' => validation_errors()));
-        exit();
-      }
-      else
-      {
-        $pf = $this->security->xss_clean($this->input->post('pf'));
-        $start = date('Y-m-d', strtotime($this->security->xss_clean($this->input->post('start'))));
-        $end = date('Y-m-d', strtotime($this->security->xss_clean($this->input->post('end'))));
-        
-        $basic = $this->patient_model->get_id_by_file_number($pf);
-        if(empty($basic))
+
+        if ($this->form_validation->run() == FALSE)
         {
-          echo json_encode(array("status" => FALSE , 'data' => '<span class="text-danger"> Oops!, this patient is not available </span>'));
+          echo json_encode(array("status" => FALSE, 'data' => validation_errors()));
           exit();
         }
         else
         {
-          $result = $this->patient_model->client_history_lab($pf, $start, $end);
-          if(empty($result))
+          $pf = $this->security->xss_clean($this->input->post('pf'));
+          $start = date('Y-m-d', strtotime($this->security->xss_clean($this->input->post('start'))));
+          $end = date('Y-m-d', strtotime($this->security->xss_clean($this->input->post('end'))));
+
+          $basic = $this->patient_model->get_id_by_file_number($pf);
+          if(empty($basic))
           {
-            echo json_encode(array("status" => FALSE , 'data' => '<span class="text-danger"> Oops!, a patient with PF <code>'.$pf.'</code> has got no history in the date range <code>'.$start.'</code> - <code>'.$end.'</code></span>'));
+            echo json_encode(array("status" => FALSE , 'data' => '<span class="text-danger"> Oops!, this patient is not available </span>'));
             exit();
           }
           else
           {
-            echo json_encode(array("status" => TRUE, 'data' => $result));
-            exit();	
+            $result = $this->patient_model->client_history_lab($pf, $start, $end);
+            if(empty($result))
+            {
+              echo json_encode(array("status" => FALSE , 'data' => '<span class="text-danger"> Oops!, a patient with PF <code>'.$pf.'</code> has got no history in the date range <code>'.$start.'</code> - <code>'.$end.'</code></span>'));
+              exit();
+            }
+            else
+            {
+              echo json_encode(array("status" => TRUE, 'data' => $result));
+              exit();	
+            }
           }
         }
-      }
-    } catch (\Throwable $th) {
+      } catch (\Throwable $th) {
         echo json_encode(array("status" => FALSE, 'data' => $th->getMessage()));
         exit();          
-    }
+      }
     }
     $this->load->view('pages/lab/patient_history', $data);
+  }
+
+  public function patient_history_2($patient_id, $record=0)
+  {
+    $patient = $this->security->xss_clean($patient_id);
+    $patient_data = $this->patient_model->get_patient_by_id($patient);
+    if(empty($patient_data))
+    {
+      echo json_encode(array("status" => FALSE, 'data' => '<code>No such record</code>'));
+      exit();
+    }
+    else
+    {    
+      $recordPerPage = 6;
+      if($record != 0)
+      {
+        $record = ($record-1) * $recordPerPage;
+      }
+
+      $recordCount = $this->patient_model->client_history_lab2_count($patient);
+      $results = $this->patient_model->client_history_lab2($record, $recordPerPage, $patient);
+      $config['base_url'] = base_url().'lab/client-history/'.$patient.'/'.$record;
+      $config['use_page_numbers'] = TRUE;
+      $config['next_link'] = 'Next';
+      $config['prev_link'] = 'Previous';
+      $config['total_rows'] = $recordCount;
+      $config['per_page'] = $recordPerPage;
+      $config['num_links'] = 5;
+
+      $config['full_tag_open'] = '<ul class="pagination justify-content-center mt-2">';        
+      $config['full_tag_close'] = '</ul>';        
+      $config['first_link'] = 'First';        
+      $config['last_link'] = 'Last';        
+      $config['first_tag_open'] = '<li class="page-item"><span class="page-link">';        
+      $config['first_tag_close'] = '</span></li>';        
+      $config['prev_link'] = '&laquo';        
+      $config['prev_tag_open'] = '<li class="page-item"><span class="page-link">';        
+      $config['prev_tag_close'] = '</span></li>';        
+      $config['next_link'] = '&raquo';        
+      $config['next_tag_open'] = '<li class="page-item"><span class="page-link">';        
+      $config['next_tag_close'] = '</span></li>';        
+      $config['last_tag_open'] = '<li class="page-item"><span class="page-link">';        
+      $config['last_tag_close'] = '</span></li>';        
+      $config['cur_tag_open'] = '<li class="page-item active"><a class="page-link" href="#">';        
+      $config['cur_tag_close'] = '</a></li>';        
+      $config['num_tag_open'] = '<li class="page-item"><span class="page-link">';        
+      $config['num_tag_close'] = '</span></li>';
+
+      $this->pagination->initialize($config);
+      $data['pagination'] = $this->pagination->create_links();
+      $data['historyData'] = $results;
+      echo json_encode(array("status" => TRUE, 'data' => $data));
+      exit();
+    }
   }
   
   public function lab_diagnostics()

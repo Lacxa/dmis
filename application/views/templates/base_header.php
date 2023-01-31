@@ -9,8 +9,8 @@ $error = $this->session->flashdata('error');
 $success = $this->session->flashdata('success');
 
 $csrf = array(
-        'name' => $this->security->get_csrf_token_name(),
-        'hash' => $this->security->get_csrf_hash()
+  'name' => $this->security->get_csrf_token_name(),
+  'hash' => $this->security->get_csrf_hash()
 );
 ?>
 
@@ -213,18 +213,18 @@ $csrf = array(
             <!-- </li>End Messages Nav -->
 
             <li class="nav-item dropdown pe-3">
-              
-            <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-              <img src="<?php echo base_url('assets/img/nit.png');?>" alt="Profile" class="rounded-circle">
-              <span class="d-none d-md-block dropdown-toggle ps-2"> <?php echo $this->session->userdata('user_fname')[0].'. '.$this->session->userdata('user_lname'); ?></span>
-            </a>
-            
-            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-              <li class="dropdown-header">
-                <h6><?php echo $this->session->userdata('user_fname').'&nbsp;'.$this->session->userdata('user_lname'); ?></h6>
-                <span><?php echo strtoupper($this->session->userdata('user_category')).'&nbsp;('.strtoupper($this->session->userdata('user_role_name')).')';?></span>
-              </li>
-              <li><hr class="dropdown-divider"></li>
+
+              <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+                <img src="<?php echo base_url('assets/img/nit.png');?>" alt="Profile" class="rounded-circle">
+                <span class="d-none d-md-block dropdown-toggle ps-2"> <?php echo $this->session->userdata('user_fname')[0].'. '.$this->session->userdata('user_lname'); ?></span>
+              </a>
+
+              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                <li class="dropdown-header">
+                  <h6><?php echo $this->session->userdata('user_fname').'&nbsp;'.$this->session->userdata('user_lname'); ?></h6>
+                  <span><?php echo strtoupper($this->session->userdata('user_category')).'&nbsp;('.strtoupper($this->session->userdata('user_role_name')).')';?></span>
+                </li>
+                <li><hr class="dropdown-divider"></li>
 
                 <li>
                   <a class="dropdown-item d-flex align-items-center" href="<?php echo base_url('password/change/0/'.@$header);?>">
@@ -254,14 +254,14 @@ $csrf = array(
       <!-- ======= Sidebar ======= -->
       <aside id="sidebar" class="sidebar">
         <ul class="sidebar-nav" id="sidebar-nav">
-          
-        <?php if($this->session->userdata('user_role') == 'SUPER' || $this->session->userdata('user_role') == 'ADMIN' || $this->session->userdata('user_role') == 'PH') { ?>
-          <li class="nav-item">
-            <a class="nav-link " href="<?php echo base_url();?>">
-              <i class="bi bi-grid"></i>
-              <span>Dashboard</span>
-            </a>
-          </li>
+
+          <?php if($this->session->userdata('user_role') == 'SUPER' || $this->session->userdata('user_role') == 'ADMIN' || $this->session->userdata('user_role') == 'PH') { ?>
+            <li class="nav-item">
+              <a class="nav-link " href="<?php echo base_url();?>">
+                <i class="bi bi-grid"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
           <?php } ?>
 
           <li class="nav-heading">Pages</li>
@@ -275,23 +275,23 @@ $csrf = array(
               </a>
             </li>
 
-          <li class="nav-item">
-            <a class="nav-link collapsed" data-bs-target="#export-nav" data-bs-toggle="collapse" href="#">
-              <i class="bi bi-gear"></i><span>Settings</span><i class="bi bi-chevron-down ms-auto"></i>
-            </a>
-            <ul id="export-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-              <li>
-                <a href="<?php echo base_url('disease/admin');?>">
+            <li class="nav-item">
+              <a class="nav-link collapsed" data-bs-target="#export-nav" data-bs-toggle="collapse" href="#">
+                <i class="bi bi-gear"></i><span>Settings</span><i class="bi bi-chevron-down ms-auto"></i>
+              </a>
+              <ul id="export-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                <li>
+                  <a href="<?php echo base_url('disease/admin');?>">
                     <i class="bi bi-circle"></i><span>Diseases</span>
                   </a>
                 </li>
                 <li>
                   <a href="<?php echo base_url('pharmacy/reports');?>">
-                      <i class="bi bi-circle"></i><span>Reports</span>
-                    </a>
-                  </li>
-                </ul>
-              </li>
+                    <i class="bi bi-circle"></i><span>Reports</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
 
           <?php } else if($this->session->userdata('user_role') == 'PH') { ?>
 
@@ -445,32 +445,32 @@ $csrf = array(
                 </a>
               </li> -->
 
-              <?php } else if($this->session->userdata('user_role') == 'REC'){ ?>
+            <?php } else if($this->session->userdata('user_role') == 'REC'){ ?>
 
-                <li class="nav-item">
-                  <a class="nav-link collapsed" href="<?php echo base_url('reception/patient-registration');?>">
-                    <i class="bi bi-card-list"></i>
-                    <span>Registration</span>
-                  </a>
-                </li>
+              <li class="nav-item">
+                <a class="nav-link collapsed" href="<?php echo base_url('reception/patient-registration');?>">
+                  <i class="bi bi-card-list"></i>
+                  <span>Registration</span>
+                </a>
+              </li>
 
-                <li class="nav-item">
-                  <a class="nav-link collapsed" href="<?php echo base_url('reception/my-patients');?>">
-                    <i class="bi bi-people"></i>
-                    <span>My Patients</span>
-                  </a>
-                </li>
-                
-                <li class="nav-item">
-                  <a class="nav-link collapsed" data-bs-target="#export-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-search"></i><span>Extra</span><i class="bi bi-chevron-down ms-auto"></i>
-                  </a>
-                  <ul id="export-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                      <a href="<?php echo base_url('reception/modifications');?>">
-                        <i class="bi bi-circle"></i><span>Modifications</span>
-                      </a>
-                    </li>
+              <li class="nav-item">
+                <a class="nav-link collapsed" href="<?php echo base_url('reception/my-patients');?>">
+                  <i class="bi bi-people"></i>
+                  <span>My Patients</span>
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#export-nav" data-bs-toggle="collapse" href="#">
+                  <i class="bi bi-search"></i><span>Extra</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="export-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                  <li>
+                    <a href="<?php echo base_url('reception/modifications');?>">
+                      <i class="bi bi-circle"></i><span>Modifications</span>
+                    </a>
+                  </li>
                     <!-- <li>
                       <a href="<f?php echo base_url('reception/reports');?>">
                           <i class="bi bi-circle"></i><span>Reports</span>
@@ -482,26 +482,31 @@ $csrf = array(
                 <?php } ?>
 
                 <?php if($this->session->userdata('user_isIncharge') || $this->session->userdata('user_role') == 'SUPER' || $this->session->userdata('user_role') == 'ADMIN') { ?>
-                <li class="nav-item">
-                  <a class="nav-link collapsed" data-bs-target="#pro-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-cpu"></i><span>Pro</span><i class="bi bi-chevron-down ms-auto"></i>
-                  </a>
-                  <ul id="pro-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                      <a href="<?php echo base_url('reports/monitor/'.@$header); ?>">
-                        <i class="bi bi-box-arrow-right"></i><span>Patients Monitor</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="<?php echo base_url('reports/served-patients/'.@$header);?>">
-                        <i class="bi bi-circle"></i><span>Treated Patients</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="<?php echo base_url('reports/incomplete-patients/'.@$header);?>">
-                        <i class="bi bi-circle"></i><span>Incomplete Patients</span>
-                      </a>
-                    </li>
+                  <li class="nav-item">
+                    <a class="nav-link collapsed" data-bs-target="#pro-nav" data-bs-toggle="collapse" href="#">
+                      <i class="bi bi-cpu"></i><span>Pro</span><i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <ul id="pro-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                      <li>
+                        <a href="<?php echo base_url('reports/monitor/'.@$header); ?>">
+                          <i class="bi bi-box-arrow-right"></i><span>Patients Monitor</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="<?php echo base_url('reports/served-patients/'.@$header);?>">
+                          <i class="bi bi-circle"></i><span>Treated Patients</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="<?php echo base_url('reports/incomplete-patients/'.@$header);?>">
+                          <i class="bi bi-circle"></i><span>Incomplete Patients</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="<?php echo base_url('reports/db-backup/'.@$header);?>">
+                          <i class="bi bi-circle"></i><span>Database Backup</span>
+                        </a>
+                      </li>
                     </ul>
                   </li>
                 <?php } ?>

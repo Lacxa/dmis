@@ -21,150 +21,149 @@ $csrf = array(
             </div>
             <div class="col-lg-12">
                   <div class="card">
-                              <div class="card-body pt-3">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                          <h4 class="card-title">Patient Service Area</h4>
-                                           <div>
-                                                <a type="button" href="<?php echo base_url('doctor/set-in-patient/');?>" class="btn btn-danger" id="set-in-patient">
-                                                <i class="bi bi-exclamation-circle me-1"></i>Set In-Patient
-                                                </a>
-                                                <a type="button" href="<?php echo base_url('doctor/release-patient/'); ?>" class="btn btn-primary" id="release-patient"><i class="bi bi-person-check me-1"></i> Release
-                                                </a>
+                        <div class="card-body pt-3">
+                              <div class="d-flex justify-content-between align-items-center">
+                                    <h4 class="card-title">Patient Service Area</h4>
+                                    <div>
+                                          <a type="button" href="<?php echo base_url('doctor/set-in-patient/');?>" class="btn btn-danger" id="set-in-patient"><i class="bi bi-exclamation-circle me-1"></i>In-Patient</a>
+                                          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#historyModal"><i class="bi bi-clock-history me-1"></i> History</button>
+                                          <a type="button" href="<?php echo base_url('doctor/release-patient/'); ?>" class="btn btn-primary" id="release-patient"><i class="bi bi-person-check me-1"></i> Release
+                                          </a>
+                                    </div>
+                              </div>
+                              <ul class="nav nav-tabs nav-tabs-bordered">
+                                    <li class="nav-item">
+                                          <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Vital Signs </button>
+                                    </li>
+                                    <li class="nav-item">
+                                          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#chief-complaints">Patient History</button>
+                                    </li>
+                                    <li class="nav-item">
+                                          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#lab-investigations">Lab Investigations</button>
+                                    </li>
+                                    <li class="nav-item">
+                                          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#disease-section">Diseases</button>
+                                    </li>
+                                    <li class="nav-item">
+                                          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#medications-section">Medications</button>
+                                    </li>
+                              </ul>
+                              <div class="tab-content pt-2">
+                                    <div class="tab-pane fade show active profile-overview" id="profile-overview">
+                                          <h5 class="card-title">Profile and vital signs</h5>
+                                          <div class="row">
+                                                <div class="col-lg-3 col-md-4 label ">Patient</div>
+                                                <div class="col-lg-9 col-md-8" id="patient_pf"></div>
+                                          </div>
+                                          <div class="row">
+                                                <div class="col-lg-3 col-md-4 label">Address</div>
+                                                <div class="col-lg-9 col-md-8" id="address"></div>
+                                          </div>
+                                          <div class="row">
+                                                <div class="col-lg-3 col-md-4 label">Age</div>
+                                                <div class="col-lg-9 col-md-8" id="patient_age"></div>
+                                          </div>
+                                          <div class="row">
+                                                <div class="col-lg-3 col-md-4 label">Blood Pressure</div>
+                                                <div class="col-lg-9 col-md-8" id="blood_pressure"></div>
+                                          </div>
+                                          <div class="row">
+                                                <div class="col-lg-3 col-md-4 label">Pulse Rate</div>
+                                                <div class="col-lg-9 col-md-8" id="pulse_rate"></div>
+                                          </div>
+                                          <div class="row">
+                                                <div class="col-lg-3 col-md-4 label">Respiration Rate</div>
+                                                <div class="col-lg-9 col-md-8" id="resp_rate"></div>
+                                          </div>
+                                          <div class="row">
+                                                <div class="col-lg-3 col-md-4 label">Weight</div>
+                                                <div class="col-lg-9 col-md-8" id="weight"></div>
+                                          </div>
+                                          <div class="row">
+                                                <div class="col-lg-3 col-md-4 label">Height</div>
+                                                <div class="col-lg-9 col-md-8" id="height"></div>
+                                          </div>
+                                          <div class="row">
+                                                <div class="col-lg-3 col-md-4 label">BMI</div>
+                                                <div class="col-lg-9 col-md-8" id="bmi_value"></div>
+                                          </div>
+                                          <div class="row">
+                                                <div class="col-lg-3 col-md-4 label">Temperature</div>
+                                                <div class="col-lg-9 col-md-8" id="temeperature"></div>
                                           </div>
                                     </div>
-                                    <ul class="nav nav-tabs nav-tabs-bordered">
-                                          <li class="nav-item">
-                                                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Vital Signs </button>
-                                          </li>
-                                          <li class="nav-item">
-                                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#chief-complaints">Patient History</button>
-                                          </li>
-                                          <li class="nav-item">
-                                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#lab-investigations">Lab Investigations</button>
-                                          </li>
-                                          <li class="nav-item">
-                                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#disease-section">Diseases</button>
-                                          </li>
-                                          <li class="nav-item">
-                                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#medications-section">Medications</button>
-                                          </li>
-                                    </ul>
-                                    <div class="tab-content pt-2">
-                                          <div class="tab-pane fade show active profile-overview" id="profile-overview">
-                                                <h5 class="card-title">Profile and vital signs</h5>
-                                                <div class="row">
-                                                      <div class="col-lg-3 col-md-4 label ">Patient</div>
-                                                      <div class="col-lg-9 col-md-8" id="patient_pf"></div>
+
+                                    <div class="tab-pane fade profile-edit pt-3" id="chief-complaints">
+
+                                          <div class="col-md-12 border rounded px-3 py-2 mb-3">
+                                                <h5 class="card-title">Chief complaints <i class="text-danger">*</i></h5>
+                                                <div class="col-md-12 mb-1">
+                                                      <input type="text" name="search_complaint" id="search_complaint" placeholder="Filter to add complaint" class="form-control" />
+                                                      <div id="complaint_result" class="list-group mb-2"></div>
                                                 </div>
-                                                <div class="row">
-                                                      <div class="col-lg-3 col-md-4 label">Address</div>
-                                                      <div class="col-lg-9 col-md-8" id="address"></div>
-                                                </div>
-                                                <div class="row">
-                                                      <div class="col-lg-3 col-md-4 label">Age</div>
-                                                      <div class="col-lg-9 col-md-8" id="patient_age"></div>
-                                                </div>
-                                                <div class="row">
-                                                      <div class="col-lg-3 col-md-4 label">Blood Pressure</div>
-                                                      <div class="col-lg-9 col-md-8" id="blood_pressure"></div>
-                                                </div>
-                                                <div class="row">
-                                                      <div class="col-lg-3 col-md-4 label">Pulse Rate</div>
-                                                      <div class="col-lg-9 col-md-8" id="pulse_rate"></div>
-                                                </div>
-                                                <div class="row">
-                                                      <div class="col-lg-3 col-md-4 label">Respiration Rate</div>
-                                                      <div class="col-lg-9 col-md-8" id="resp_rate"></div>
-                                                </div>
-                                                <div class="row">
-                                                      <div class="col-lg-3 col-md-4 label">Weight</div>
-                                                      <div class="col-lg-9 col-md-8" id="weight"></div>
-                                                </div>
-                                                <div class="row">
-                                                      <div class="col-lg-3 col-md-4 label">Height</div>
-                                                      <div class="col-lg-9 col-md-8" id="height"></div>
-                                                </div>
-                                                <div class="row">
-                                                      <div class="col-lg-3 col-md-4 label">BMI</div>
-                                                      <div class="col-lg-9 col-md-8" id="bmi_value"></div>
-                                                </div>
-                                                <div class="row">
-                                                      <div class="col-lg-3 col-md-4 label">Temperature</div>
-                                                      <div class="col-lg-9 col-md-8" id="temeperature"></div>
+                                                <div id="client_complaint">
                                                 </div>
                                           </div>
 
-                                          <div class="tab-pane fade profile-edit pt-3" id="chief-complaints">
 
-                                                <div class="col-md-12 border rounded px-3 py-2 mb-3">
-                                                      <h5 class="card-title">Chief complaints <i class="text-danger">*</i></h5>
-                                                      <div class="col-md-12 mb-1">
-                                                            <input type="text" name="search_complaint" id="search_complaint" placeholder="Filter to add complaint" class="form-control" />
-                                                            <div id="complaint_result" class="list-group mb-2"></div>
-                                                      </div>
-                                                      <div id="client_complaint">
-                                                      </div>
-                                                </div>
-
-
-                                                <div class="col-md-12 border rounded px-3 mb-2" id="comp_history">
-                                                      <h5 class="card-title"> Amplifications</h5>
-                                                      <form method="post" id="comp_history_form" class="row" action="javascript:void(0);">
-                                                            <input type="hidden" name="<?php echo $csrf['name'];?>" value="<?php echo $csrf['hash'];?>" />
-                                                            <!-- <input type="text" name="duration" id="duration"  /> -->
-                                                            <div class="col-md-12 mb-2">
-                                                                  <select name="complaint" id="complaint" class="form-select"></select>
-                                                            </div>
-                                                            <div class="col-md-12 mb-1">
-                                                                  <textarea name="history" id="history" class="form-control"></textarea>
-                                                            </div>
-                                                            <div class="col-md-12 d-grid gap-2">
-                                                              <button id="complaintSubmitBtn" class="btn btn-primary" type="submit">Submit amplifications</button>
-                                                        </div>
-                                                  </form>
-                                                  <ul class="list-group my-2" id="complaint_history">
-                                                  </ul>
-                                            </div>
-
-                                            <div class="col-md-12 border rounded py-2 mb-3" id="phy_exam">
-                                                <h5 class="card-title mx-3"> Physical examination</h5>
-                                                <form method="post" id="phy_exam_form" class="mx-3" action="javascript:void(0);">
+                                          <div class="col-md-12 border rounded px-3 mb-2" id="comp_history">
+                                                <h5 class="card-title"> Amplifications</h5>
+                                                <form method="post" id="comp_history_form" class="row" action="javascript:void(0);">
                                                       <input type="hidden" name="<?php echo $csrf['name'];?>" value="<?php echo $csrf['hash'];?>" />
-                                                      <div class="quill-editor-default" id="quillArea" style="height: 70px;"></div>
-                                                      <textarea name="exam_text" style="display:none" id="hiddenArea"></textarea>
-                                                      <div class="d-grid gap-2"> <button id="examSubmitBtn" type="submit" class="btn btn-primary mt-1">Submit physical examination</button>
+                                                      <!-- <input type="text" name="duration" id="duration"  /> -->
+                                                      <div class="col-md-12 mb-2">
+                                                            <select name="complaint" id="complaint" class="form-select"></select>
                                                       </div>
-                                                </form>
-                                          </div>
-                                    </div>
+                                                      <div class="col-md-12 mb-1">
+                                                            <textarea name="history" id="history" class="form-control"></textarea>
+                                                      </div>
+                                                      <div class="col-md-12 d-grid gap-2">
+                                                          <button id="complaintSubmitBtn" class="btn btn-primary" type="submit">Submit amplifications</button>
+                                                    </div>
+                                              </form>
+                                              <ul class="list-group my-2" id="complaint_history">
+                                              </ul>
+                                        </div>
 
-                                    <div class="tab-pane fade pt-3" id="lab-investigations"> <?php if(empty($categories)){ echo 'No results';} else { ?>
-                                          <form method="post" action="javascript:void(0);" id="investigationForm">
+                                        <div class="col-md-12 border rounded py-2 mb-3" id="phy_exam">
+                                          <h5 class="card-title mx-3"> Physical examination</h5>
+                                          <form method="post" id="phy_exam_form" class="mx-3" action="javascript:void(0);">
                                                 <input type="hidden" name="<?php echo $csrf['name'];?>" value="<?php echo $csrf['hash'];?>" />
+                                                <div class="quill-editor-default" id="quillArea" style="height: 70px;"></div>
+                                                <textarea name="exam_text" style="display:none" id="hiddenArea"></textarea>
+                                                <div class="d-grid gap-2"> <button id="examSubmitBtn" type="submit" class="btn btn-primary mt-1">Submit physical examination</button>
+                                                </div>
+                                          </form>
+                                    </div>
+                              </div>
 
-                                                <div class="accordion row mx-1" id="investigation_categories_">
-                                                      <?php foreach ($categories as $value) { ?>
+                              <div class="tab-pane fade pt-3" id="lab-investigations"> <?php if(empty($categories)){ echo 'No results';} else { ?>
+                                    <form method="post" action="javascript:void(0);" id="investigationForm">
+                                          <input type="hidden" name="<?php echo $csrf['name'];?>" value="<?php echo $csrf['hash'];?>" />
+
+                                          <div class="accordion row mx-1" id="investigation_categories_">
+                                                <?php foreach ($categories as $value) { ?>
                                                       <div class="accordion-item col-md-6 investigation-block" id="accordion_<?php echo $value->icat_token; ?>">
                                                             <h2 class="accordion-header" id="flush-headingOne<?php echo $value->icat_id; ?>">
-                                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne<?php echo $value->icat_id; ?>" aria-expanded="false" aria-controls="flush-collapseOne<?php echo $value->icat_id; ?>"> <div class="form-check"><input class="form-check-input parent" name='parent' id="parent-<?php echo $value->icat_id; ?>" type="checkbox"><label class="form-check-label" for="parent-<?php echo $value->icat_id; ?>"><?php echo $value->icat_name; ?><?php echo empty($value->icat_alias) ? '':' <code>('.$value->icat_alias.')</code>'; ?> <span id="check-indictor"></span></label></div>
-                                                            </button>
+                                                                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne<?php echo $value->icat_id; ?>" aria-expanded="false" aria-controls="flush-collapseOne<?php echo $value->icat_id; ?>"> <div class="form-check"><input class="form-check-input parent" name='parent' id="parent-<?php echo $value->icat_id; ?>" type="checkbox"><label class="form-check-label" for="parent-<?php echo $value->icat_id; ?>"><?php echo $value->icat_name; ?><?php echo empty($value->icat_alias) ? '':' <code>('.$value->icat_alias.')</code>'; ?> <span id="check-indictor"></span></label></div>
+                                                                  </button>
                                                             </h2>
 
                                                             <div id="flush-collapseOne<?php echo $value->icat_id;?>" class="accordion-collapse collapse" aria-labelledby="flush-headingOne<?php echo $value->icat_id; ?>" data-bs-parent="#investigation_categories">
-                                                            <div class="accordion-body">
-                                                                  <ul class="list-group">
-                                                                        <?php foreach ($subcategories as $sub){ if($sub->isub_category == $value->icat_token) { ?>
-                                                                        <li class="list-group-item form-check" id="inv_subcat_<?php echo $sub->isub_token;?>">
+                                                                  <div class="accordion-body">
+                                                                        <ul class="list-group">
+                                                                              <?php foreach ($subcategories as $sub){ if($sub->isub_category == $value->icat_token) { ?>
+                                                                                    <li class="list-group-item form-check" id="inv_subcat_<?php echo $sub->isub_token;?>">
 
-                                                                        <div class="form-check">
-                                                                              <input value="<?php echo $sub->isub_token; ?>" class="form-check-input child" name='investigation_ids' type="checkbox" id="inv_cat_<?php echo $sub->isub_token;?>">
-                                                                              <label class="form-check-label" for="inv_cat_<?php echo $sub->isub_token;?>"><?php echo $sub->isub_name; ?><?php echo empty($sub->isub_alias) ? '':' <code>('.$sub->isub_alias.')</code>'; ?></label>
-                                                                        </div>
-                                                                        <span class="my-inv"></span>
-                                                                  </li>
-                                                                  <?php }}?>
-                                                                  </ul>
-                                                            </div>
+                                                                                          <div class="form-check">
+                                                                                                <input value="<?php echo $sub->isub_token; ?>" class="form-check-input child" name='investigation_ids' type="checkbox" id="inv_cat_<?php echo $sub->isub_token;?>">
+                                                                                                <label class="form-check-label" for="inv_cat_<?php echo $sub->isub_token;?>"><?php echo $sub->isub_name; ?><?php echo empty($sub->isub_alias) ? '':' <code>('.$sub->isub_alias.')</code>'; ?></label>
+                                                                                          </div>
+                                                                                          <span class="my-inv"></span>
+                                                                                    </li>
+                                                                              <?php }}?>
+                                                                        </ul>
+                                                                  </div>
                                                             </div>
                                                       </div>
                                                 <?php } ?>
@@ -201,12 +200,29 @@ $csrf = array(
             </div>
       </div>
 </div>
+
+<div class="modal fade" id="historyModal" tabindex="-1">
+      <div class="modal-dialog modal-fullscreen">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="modal-title"></h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                  <span id="history_span"></span>
+                  <span id="history_pagination"></span>
+            </div>
+            <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+      </div>
+</div>
+</div>
 </div>
 </section>
 <?php $this->load->view('templates/base_footer.php'); ?>
 <script type="text/javascript">
       $(function() {
-
             $('input[type=checkbox].parent').change(function(){
                   var parent_id = $(this).closest('.accordion-item').attr('id');
                   var is_parent_checked = $(this).is(':checked');
@@ -222,7 +238,6 @@ $csrf = array(
             });
 
             $('input[type=checkbox].child').change(function(){
-                  // if is checked
                   if(this.checked){
                         // check all children
                         var lenchk = $(this).closest('ul').find(':checkbox');
@@ -239,17 +254,17 @@ $csrf = array(
                         // $(this).closest('.checkbox').find(':checkbox').prop('checked', false);
                         // $(this).closest('ul').siblings().find(':checkbox').prop('checked', false);
                         $(this).closest('.accordion-item').find('input[type=checkbox].parent').prop('checked', false);
-                        }
-                  });
+                  }
+            });
 
             // On page load, retrieve patient on session
             get_session();
             function get_session(){
                   $.ajax({
                         type: "GET",  
-                        url: "<?php echo base_url('doctor/get-full-session-info/').$my_session; ?>",  
+                        url: `<?php echo base_url('doctor/get-full-session-info/').$my_session; ?>`,  
                         data: "{}",
-                        dataType: 'json',
+                        dataType: "json",
                         success: function (response){
                               if(response.status){
                                     var data = response.data;
@@ -323,9 +338,9 @@ $csrf = array(
                                                 class="form-control form-control-sm" placeholder="Enter further description">
                                                 </div>
                                                 <div class="col-md-2">
-                                                      <div class="d-grid gap-2">
-                                                            <button data-id="${value.token}" id="submitDescBtn${value.token}" class="btn btn-primary btn-sm"><i class="bi bi-cloud-upload me-1"></i> Save</button>
-                                                      </div>
+                                                <div class="d-grid gap-2">
+                                                <button data-id="${value.token}" id="submitDescBtn${value.token}" class="btn btn-primary btn-sm"><i class="bi bi-cloud-upload me-1"></i> Save</button>
+                                                </div>
                                                 </div>
                                                 </div>
                                                 `;
@@ -556,61 +571,61 @@ $("div#client_complaint").on('click', 'a', function() {
 // Save amplifications
 $("#comp_history_form").validate({
       errorPlacement: function(error, element) {
-          error.addClass('text-danger');
-          error.insertAfter(element);
+        error.addClass('text-danger');
+        error.insertAfter(element);
+  },
+  debug: false,
+  errorClass: "is-invalid",
+  validClass: "is-valid",
+  errorElement: "div",
+  rules: { 
+        complaint: { required: true },
+        history: { required: true, minlength: 1, maxlength: 300 },
+  },
+  highlight: function( element, errorClass, validClass ) {
+        $(element).addClass(errorClass).removeClass(validClass);
+  },
+  unhighlight: function( element, errorClass, validClass ) {
+        $(element).removeClass(errorClass).addClass(validClass);
+  },
+  submitHandler: function () {
+        var dialog = bootbox
+        .dialog({
+          message:
+          '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Please wait...</div>',
+          closeButton: false,
+    })
+        .on("shown.bs.modal", function () {
+          var formdata = $("#comp_history_form").serialize();
+          var record_id = $('div#session_ids').find('input[name="session_record_id"]').val();
+          var symptom_id = $('div#session_ids').find('input[name="session_symptom_id"]').val();
+          var visit_id = $('div#session_ids').find('input[name="session_visit_id"]').val();
+          $.ajax({
+            url: '<?php echo base_url('doctor/save-complaint-history/'); ?>'+symptom_id+'/'+record_id+'/'+visit_id,
+            type: "POST",
+            data: formdata,
+            dataType: "JSON",
+            success: function (response) {
+              if (response.status) {
+                $("#comp_history_form")[0].reset();
+                bootbox.alert(response.data.toString(), function () {
+                  get_session();
+                  dialog.modal("hide");
+            });
+          } else {
+                bootbox.alert(response.data.toString(), function () {
+                  dialog.modal("hide");
+            });
+          }
     },
-    debug: false,
-    errorClass: "is-invalid",
-    validClass: "is-valid",
-    errorElement: "div",
-    rules: { 
-          complaint: { required: true },
-          history: { required: true, minlength: 1, maxlength: 300 },
-    },
-    highlight: function( element, errorClass, validClass ) {
-          $(element).addClass(errorClass).removeClass(validClass);
-    },
-    unhighlight: function( element, errorClass, validClass ) {
-          $(element).removeClass(errorClass).addClass(validClass);
-    },
-    submitHandler: function () {
-          var dialog = bootbox
-          .dialog({
-              message:
-              '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Please wait...</div>',
-              closeButton: false,
-        })
-          .on("shown.bs.modal", function () {
-              var formdata = $("#comp_history_form").serialize();
-              var record_id = $('div#session_ids').find('input[name="session_record_id"]').val();
-              var symptom_id = $('div#session_ids').find('input[name="session_symptom_id"]').val();
-              var visit_id = $('div#session_ids').find('input[name="session_visit_id"]').val();
-              $.ajax({
-                  url: '<?php echo base_url('doctor/save-complaint-history/'); ?>'+symptom_id+'/'+record_id+'/'+visit_id,
-                  type: "POST",
-                  data: formdata,
-                  dataType: "JSON",
-                  success: function (response) {
-                      if (response.status) {
-                          $("#comp_history_form")[0].reset();
-                          bootbox.alert(response.data.toString(), function () {
-                              get_session();
-                              dialog.modal("hide");
-                        });
-                    } else {
-                          bootbox.alert(response.data.toString(), function () {
-                              dialog.modal("hide");
-                        });
-                    }
-              },
-              error: function (jqXHR, textStatus, errorThrown) {
-                  bootbox.alert(errorThrown.toString(), function () {
-                        dialog.modal("hide");
-                  });
-            },
+    error: function (jqXHR, textStatus, errorThrown) {
+      bootbox.alert(errorThrown.toString(), function () {
+            dialog.modal("hide");
       });
+},
 });
-    },
+    });
+  },
 });
 
 
@@ -847,7 +862,7 @@ $("ol#client_disease").on('click', 'a', function() {
 });
 
  // Search medicine
- $('div#medicine-selection input#search_medicine').keyup(function() {
+$('div#medicine-selection input#search_medicine').keyup(function() {
       $('#medicine_result').html("");
       var search = $(this).val();
       if(search){
@@ -884,7 +899,7 @@ $("ol#client_disease").on('click', 'a', function() {
 });
 
  // Save the selected medicine
- $("div#medicine_result").on('click', 'a', function() {
+$("div#medicine_result").on('click', 'a', function() {
       var search = $('#search_medicine').val("");
       var medicine_id = $(this).attr('data-id');
       var medicine_name = $(this).attr('data-title');
@@ -1037,7 +1052,7 @@ $("ol#client_medicines").on('click', 'a', function() {
 
 
  // Release patient
- $("a#release-patient").on("click", function(e) {
+$("a#release-patient").on("click", function(e) {
       var record_id = $('div#session_ids').find('input[name="session_record_id"]').val();
       var link = '<?php echo base_url('doctor/release-patient/'); ?>'+record_id;
 
@@ -1061,27 +1076,144 @@ $("ol#client_medicines").on('click', 'a', function() {
 });
 
  // Set-in-patient - observation
- $("a#set-in-patient").on("click", function(e) {
+$("a#set-in-patient").on("click", function(e) {
       var record_id = $('div#session_ids').find('input[name="session_record_id"]').val();
       var link = '<?php echo base_url('doctor/set-in-patient/'); ?>'+record_id;
 
       e.preventDefault();
-
       bootbox.confirm({
             title: '<code>' + $('#patient_pf').text() + '</code>',
             message: "Do you really want to put this patient under observation?",
-            buttons: {
-                  cancel: {
-                        label: '<i class="fa fa-times"></i> No'
-                  },
-                  confirm: {
-                        label: '<i class="fa fa-check"></i> Yes'
-                  }
-            },
+            buttons: {cancel: {label: '<i class="fa fa-times"></i> No'},confirm: {label: '<i class="fa fa-check"></i> Yes'}},
             callback: function (result) {
                   if(result == true) window.location.href = link;
             }
       });
+});
+
+function get_history(pageNum) {
+      var dialog = bootbox.dialog({
+        message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Retrieving some data...</div>',
+        closeButton: false,
+  }).on("shown.bs.modal", function () {
+        $.ajax({
+          url: `<?php echo base_url('doctor/client-history/'.$patientID);?>/${pageNum}`,
+          type: "POST",
+          data: {},
+          dataType: "JSON",
+          timeout: 10000,
+          success: function (response) {
+            if(response.status){
+              const data = response.data;
+              $("span#history_pagination").html(data.pagination);
+              setHistory(data.historyData);
+              dialog.modal("hide");
+        } else {
+              bootbox.alert(data.toString(), function () {
+                dialog.modal("hide");
+          });
+        }
+  },
+  error: function (jqXHR, textStatus, errorThrown) {
+      bootbox.alert(errorThrown.toString(), function () {
+        dialog.modal("hide");
+        console.log(jqXHR);
+  });
+},
+});
+  });
+}
+
+function setHistory(data){
+      // console.log(data);return;
+      $('#historyModal #modal-title').html("");
+      $('#historyModal #modal-title').html(`<code><?php echo $subHeading;?></code> Medical History`);
+      var html = '';
+      if(data.length == 0){
+            html += '<div class="alert alert-warning alert-dismissible fade show" role="alert"><i class="bi bi-info-circle me-1"></i>Oops!, no history</div>';
+      } else {
+            const path = '<?php echo base_url('download/investigation-file/');?>';
+            html += '<div class="row">';
+            $.each(data, function(key, value){
+                  html += '<div class="col-md-6"><div class="card"><div class="card-body">';
+                  html += `<h5 class="card-title">${value.day} <span>| Entry</span></h5>`;
+                  html += `<ul class="nav nav-tabs" id="myTab${value.instance}" role="tablist">`;
+
+                  html += '<li class="nav-item" role="presentation">';
+                  html += `<button class="nav-link active" id="complaint${value.instance}-tab" data-bs-toggle="tab" data-bs-target="#complaint${value.instance}" type="button" role="tab" aria-controls="complaint${value.instance}" aria-selected="true">Complaints</button>`;
+                  html += '</li>';
+
+                  if(value.islab == '1'){
+                        html += '<li class="nav-item" role="presentation">';
+                        html += `<button class="nav-link" id="diagnostics${value.instance}-tab" data-bs-toggle="tab" data-bs-target="#diagnostics${value.instance}" type="button" role="tab" aria-controls="diagnostics${value.instance}" aria-selected="false">Diagnostics</button>`;
+                        html += '</li>';
+                  }
+
+                  html += '<li class="nav-item" role="presentation">';
+                  html += `<button class="nav-link" id="diseases${value.instance}-tab" data-bs-toggle="tab" data-bs-target="#diseases${value.instance}" type="button" role="tab" aria-controls="diseases${value.instance}" aria-selected="false">Diseases</button>`;
+                  html += '</li>';
+
+                  html += '<li class="nav-item" role="presentation">';
+                  html += `<button class="nav-link" id="medications${value.instance}-tab" data-bs-toggle="tab" data-bs-target="#medications${value.instance}" type="button" role="tab" aria-controls="medications${value.instance}" aria-selected="false">Medications</button>`;
+                  html += '</li>';
+
+                  html += '</ul>';
+                  html += `<div class="tab-content pt-2" id="myTab${value.instance}Content">`; 
+                  html += `<div class="tab-pane fade show active" id="complaint${value.instance}" role="tabpanel" aria-labelledby="complaint${value.instance}-tab">`;
+                  html += '<ol class="list-group list-group-numbered mt-1">';
+                  $.each(value.patient_complaints, function(key1, val1){
+                        html += `<li class="list-group-item">${val1.text} (${val1.duration})${val1.amplification ? ': <code>'+val1.amplification+'</code>' : ''}</li>`;
+                  });
+                  html += '</ol>';
+                  if(value.examination){
+                        html += `<ul class="list-group mt-2"><li class="list-group-item">Physical examination: <code>${value.examination}</code></li></ul>`;
+                  }
+                  html += '</div>';
+                  if(value.islab == '1'){
+                        html += `<div class="tab-pane fade" id="diagnostics${value.instance}" role="tabpanel" aria-labelledby="diagnostics${value.instance}-tab">`;
+                        html += '<ol class="list-group list-group-numbered mt-1">';
+                        $.each(value.patient_dignostics, function(key1, val1){
+                              html += '<li class="list-group-item">';
+                              html += `${val1.name} <code>(${val1.parent})</code> | Results: ${val1.results} ${val1.alias ? '('+val1.alias+')':''} ${val1.file ? ', <code> File: </code><a target="_blank" href="'+path+val1.file+'">Download</a>' : ''}`;
+                              html += '</li>';
+                        });
+                        html += '</ol>';
+                        html += '</div>';
+                  }
+                  html += `<div class="tab-pane fade" id="diseases${value.instance}" role="tabpanel" aria-labelledby="diseases${value.instance}-tab">`;
+                  html += '<ol class="list-group list-group-numbered mt-1">';
+                  $.each(value.patient_diseases, function(key1, val1){
+                        html += `<li class="list-group-item">${val1.text+' <code>('+val1.code+')</code>'}</li>`;
+                  });
+                  html += '</ol>';
+                  html += '</div>';
+
+                  html += `<div class="tab-pane fade" id="medications${value.instance}" role="tabpanel" aria-labelledby="medications${value.instance}-tab">`;
+                  html += '<ol class="list-group list-group-numbered mt-1">';
+                  $.each(value.patient_medicines, function(key1, val1){
+                        html += '<li class="list-group-item">';
+                        html += val1.id ? `<code>Name: </code>${val1.medicine1} (${val1.medicine2}), <code>Category: </code>${val1.category}, <code>Form: </code>${val1.form}, <code>Unit: </code>${val1.unit2} ${(val1.doctor_desc && val1.doctor_desc!='null') ? '<code>Descriptions:</code> '+val1.doctor_desc:''}, <code>Consumption:</code> ${val1.consumption}` : `<code>O/S: </code>${val1.doctor_desc}`;
+                        html += '</li>';
+                  });
+                  html += '</ol>';
+                  html += '</div>';
+
+                  html += '</div>';
+                  html += '</div></div></div>';
+            });
+html += '</div>';
+}
+$("span#history_span").html(html);
+}
+
+$('#historyModal').on('show.bs.modal', function () {
+      get_history(0);
+});
+
+$('span#history_pagination').on('click','a',function(e){
+      e.preventDefault();
+      var pageNum = $(this).attr('data-ci-pagination-page');
+      get_history(pageNum);
 });
 
 

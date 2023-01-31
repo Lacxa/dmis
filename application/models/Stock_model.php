@@ -238,6 +238,7 @@ class Stock_model extends CI_Model {
         $this->db->join('medicine_categories c', 'c.medcat_token = m.med_category', 'left');
         $this->db->join('medicine_formats f', 'f.format_token = m.med_format', 'left');
         $this->db->where('b.sb_active', 1);
+        $this->db->where('s.st_usage < s.st_total');
         $this->db->group_by(array("s.st_medicine", "s.st_unit_value"));
         
         $i = 0;
@@ -269,6 +270,7 @@ class Stock_model extends CI_Model {
         $this->db->from("stock s");
         $this->db->join('stock_batches b', 'b.sb_id = s.st_batch', 'left');
         $this->db->where('b.sb_active', 1);
+        $this->db->where('s.st_usage < s.st_total');
         $this->db->group_by(array("s.st_medicine", "s.st_unit_value"));
         return $this->db->count_all_results();
     }
@@ -549,5 +551,18 @@ public function restore_stock_usage($arrayData)
         $this->db->where('st_id', $row['id']);
         $this->db->update('stock'); 
     }
-}           
+}
+
+public function stock_usage_by_record($record)
+{
+    $this->db->select('u.su_usage as consumption, CONCAT(un.mu_name, ": ",s.st_unit_value, " ",un.mu_unit) as unit, m.med_name as medicine, f.format_name as form');
+    $this->db->join('stock s', 's.st_id = u.su_stock', 'left');
+    $this->db->join('medicine_units un', 'un.mu_token = s.st_unit', 'left');
+    $this->db->join('medicines m', 'm.med_token = s.st_medicine', 'left');
+    $this->db->join('medicine_formats f', 'f.format_token = m.med_format', 'left');
+    $this->db->where('u.su_record', $record);
+    $query = $this->db->get('stock_usage u');
+    return $query->result();    
+}
+
 }

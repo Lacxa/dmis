@@ -8,7 +8,7 @@ $csrf = array(
 
 $type = $action == 1 ? 'New user' : 'Expired/Triggered';
 $a_message1 = 'For security, you are immediately prompted to change the factory-default password for the your account.';
-$a_message2 = 'Your password may have expired, or you may have triggered this action.';
+$a_message2 = 'Your password may have expired, or you have triggered this action.';
 $a_message = $action == 1 ? $a_message1 : $a_message2;
 ?>
 

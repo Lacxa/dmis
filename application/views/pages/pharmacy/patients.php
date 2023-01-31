@@ -127,7 +127,7 @@ $csrf = array(
      var file_no = $(this).attr('data-pf');
      bootbox.confirm({
       message:
-      'Serve <strong>' + name + '</strong> with file number <strong>"' + file_no + '"</strong>?',
+      'Serve <code>' + name + '</code> with file number <code>' + file_no + '</code>?',
       buttons: {
         confirm: {
           label: '<i class="fa fa-check"></i> Yes',

@@ -13,7 +13,7 @@ class Doctor extends CI_Controller {
     $this->load->model(array("employee_model", "patient_model", "investigation_model", "medicine_model", "stock_model", "complaints_model"));
     $this->mainTitle  = 'DMIS | DISPENSARY MANAGEMENT INFORMATION SYSTEM';
     $this->header = 'Doctor';
-    $this->load->library(array("form_validation", "session"));
+    $this->load->library(array("form_validation", "session", "pagination"));
     $this->load->helper(array("url", "html", "form", "security", "date"));
     $this->form_validation->set_error_delimiters('<div class="text-danger">', '</div>');
     
@@ -25,7 +25,7 @@ class Doctor extends CI_Controller {
   
   #########################################################
   # PRIVATE FUNCTIONS - TO BE ONLY CALLED WITHIN THIS CLASS
-    
+  
   private function is_first_login()
   {
     if(session_status() == PHP_SESSION_NONE) session_start();
@@ -318,6 +318,60 @@ class Doctor extends CI_Controller {
       }
     }
     $this->load->view('pages/doctor/patient_history', $data);
+  }
+  
+  public function patient_history_2($patient_id, $record=0)
+  {
+    $patient = $this->security->xss_clean($patient_id);
+    $patient_data = $this->patient_model->get_patient_by_id($patient);
+    if(empty($patient_data))
+    {
+      echo json_encode(array("status" => FALSE, 'data' => '<code>No such record</code>'));
+      exit();
+    }
+    else
+    {    
+      $recordPerPage = 4;
+      if($record != 0)
+      {
+        $record = ($record-1) * $recordPerPage;
+      }
+
+      $recordCount = $this->patient_model->client_report_post2_count($patient);
+      $results = $this->patient_model->client_report_post2($record, $recordPerPage, $patient);
+      $config['base_url'] = base_url().'doctor/client-history/'.$patient.'/'.$record;
+      $config['use_page_numbers'] = TRUE;
+      $config['next_link'] = 'Next';
+      $config['prev_link'] = 'Previous';
+      $config['total_rows'] = $recordCount;
+      $config['per_page'] = $recordPerPage;
+      $config['num_links'] = 5;
+
+      $config['full_tag_open'] = '<ul class="pagination justify-content-center mt-2">';        
+      $config['full_tag_close'] = '</ul>';        
+      $config['first_link'] = 'First';        
+      $config['last_link'] = 'Last';        
+      $config['first_tag_open'] = '<li class="page-item"><span class="page-link">';        
+      $config['first_tag_close'] = '</span></li>';        
+      $config['prev_link'] = '&laquo';        
+      $config['prev_tag_open'] = '<li class="page-item"><span class="page-link">';        
+      $config['prev_tag_close'] = '</span></li>';        
+      $config['next_link'] = '&raquo';        
+      $config['next_tag_open'] = '<li class="page-item"><span class="page-link">';        
+      $config['next_tag_close'] = '</span></li>';        
+      $config['last_tag_open'] = '<li class="page-item"><span class="page-link">';        
+      $config['last_tag_close'] = '</span></li>';        
+      $config['cur_tag_open'] = '<li class="page-item active"><a class="page-link" href="#">';        
+      $config['cur_tag_close'] = '</a></li>';        
+      $config['num_tag_open'] = '<li class="page-item"><span class="page-link">';        
+      $config['num_tag_close'] = '</span></li>';
+
+      $this->pagination->initialize($config);
+      $data['pagination'] = $this->pagination->create_links();
+      $data['historyData'] = $results;
+      echo json_encode(array("status" => TRUE, 'data' => $data));
+      exit();
+    }
   }
   
   public function session_patients()
@@ -963,7 +1017,7 @@ class Doctor extends CI_Controller {
     $patient_records = $this->session_patients_min_info($record);
     if(empty($patient_records))
     {
-      $this->session->set_flashdata('error', 'oops!, this patient does not exist');
+      $this->session->set_flashdata('error', 'Oops!, this patient does not exist');
       return redirect($_SERVER['HTTP_REFERER']);
     }
     $data = array(
@@ -971,6 +1025,7 @@ class Doctor extends CI_Controller {
       'header' => $this->header,
       'heading' => 'My Session',
       'subHeading' => $patient_records['file'],
+      'patientID' => $patient_records['patient'],
       'my_session' => $patient_records['record'],
       'categories' => $this->investigation_model->get_all_investigation_categories(),
       'subcategories' => $this->investigation_model->get_all_investigation_subcategories(),

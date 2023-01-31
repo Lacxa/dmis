@@ -55,6 +55,18 @@ class Employee_model extends CI_Model {
             return array();
         }
     }
+
+    public function get_db_backup()
+    {
+        $this->db->select('d.db_file as file_name, d.db_size as size, DATE_FORMAT(d.db_created_at, "%b %d %Y %H:%i") as day, CONCAT(e.emp_lname, ", ", e.emp_fname) as author');
+        $this->db->join('employee e', 'e.emp_pf  = d.db_author', 'left');
+        return $this->db->get('db_backup d')->row();
+    }
+
+    public function update_db_backup($data)
+    {
+        $this->db->replace('db_backup', $data);
+    }
     
     public function is_employee_active($employee_id)
     {

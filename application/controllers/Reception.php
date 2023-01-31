@@ -52,7 +52,7 @@ class Reception extends CI_Controller {
 
         $diff = date_diff($date1, $date2);
         $days = abs($diff->format("%R%a"));       
-        if($days >= 90) return redirect(base_url('password/expired/0'), 'refresh');
+        if($days >= 90) return redirect(base_url('password/change/0/'.@$this->header), 'refresh');
         
     }
     

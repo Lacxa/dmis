@@ -34,7 +34,7 @@ class Home extends CI_Controller {
 		else
 		{
 			// Login history
-			$default_times = 50;
+			$default_times = 100;
 			$pf = $this->session->userdata('user_pf');
 			$log_id = $this->uuid();
 			while($this->employee_model->check_if_uuid_exist_login_history($log_id))
@@ -142,7 +142,7 @@ class Home extends CI_Controller {
 				$is_user_available = $this->employee_model->validate_sign_in($email, $password); 
 				if ($is_user_available == FALSE)  
 				{
-					$this->session->set_flashdata('error', 'Invalid email or password');
+					$this->session->set_flashdata('error', 'Oops!, invalid email or password');
 					redirect(base_url('login'));
 				}
 				else
