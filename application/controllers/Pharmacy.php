@@ -1526,6 +1526,7 @@ public function save_prescriptions($record_id)
                                     'except' => $stock->id,
                                     'medicine_token' => $stock->medicine_token,
                                     'unit_token' => $stock->unit_token,
+                                    'unit_value' => $stock->unit_value,
                                 );
                                 $similar_stock = $this->stock_model->getSimilarStock($search);
                                 $similar_stock[] = $stock;

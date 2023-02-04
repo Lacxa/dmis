@@ -87,7 +87,6 @@
                       // console.log(jqXHR);
                     });
                   },
-                  timeout: 10000
                 });               
               });
             }

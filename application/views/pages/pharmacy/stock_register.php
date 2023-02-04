@@ -211,7 +211,7 @@ $csrf = array(
 						html += '<tbody>';
 						$.each(sub, function(key1, val1){
 							html += '<tr>';
-							html += `<td class="align-middle">${key1.toUpperCase()}</td>`;
+							html += `<td class="align-baseline">${key1.toUpperCase()}</td>`;
 							html += '<td>';
 							html += '<table class="table table-striped table-sm mb-0">';
 							html += '<thead>';

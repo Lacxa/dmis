@@ -2085,7 +2085,8 @@ class Patient_model extends CI_Model {
                     $search = array(
                         'except' => $medicine_data->id,
                         'medicine_token' => $medicine_data->medicine_token, 
-                        'unit_token' => $medicine_data->unit_token, 
+                        'unit_token' => $medicine_data->unit_token,
+                        'unit_value' => $medicine_data->unit_value,
                     );
                     $similar_stock = $this->stock->getSimilarStock($search);
                     if(!empty($similar_stock))

@@ -145,6 +145,7 @@ class Stock_model extends CI_Model {
         $this->db->where('s.st_id !=', $base_data['except']);
         $this->db->where('s.st_medicine', $base_data['medicine_token']);
         $this->db->where('s.st_unit', $base_data['unit_token']);
+        $this->db->where('s.st_unit_value', $base_data['unit_value']);
         $this->db->where('b.sb_active', 1);
         $this->db->order_by('b.sb_entry_date', 'DESC');
         $query = $this->db->get('stock s');
@@ -239,7 +240,7 @@ class Stock_model extends CI_Model {
         $this->db->join('medicine_formats f', 'f.format_token = m.med_format', 'left');
         $this->db->where('b.sb_active', 1);
         $this->db->where('s.st_usage < s.st_total');
-        $this->db->group_by(array("s.st_medicine", "s.st_unit_value"));
+        $this->db->group_by(array("s.st_medicine", "s.st_unit", "s.st_unit_value"));
         
         $i = 0;
         // loop searchable columns 
@@ -271,7 +272,7 @@ class Stock_model extends CI_Model {
         $this->db->join('stock_batches b', 'b.sb_id = s.st_batch', 'left');
         $this->db->where('b.sb_active', 1);
         $this->db->where('s.st_usage < s.st_total');
-        $this->db->group_by(array("s.st_medicine", "s.st_unit_value"));
+        $this->db->group_by(array("s.st_medicine", "s.st_unit", "s.st_unit_value"));
         return $this->db->count_all_results();
     }
 
@@ -481,7 +482,8 @@ public function updateArray($array_ids, $update_data)
 
 public function get_Stock_Medicines($keyword)
 {
-    $this->db->select('s.st_id as stock_id, s.st_code as stock_token, s.st_unit_value as unit_value, s.st_total as total, s.st_usage as usage, DATE_FORMAT(s.st_date_created, "%M %d %Y") as entry, u.mu_name as unit_title, u.mu_unit as unit_name, m.med_name as medicine1, m.med_alias as medicine2, c.medcat_name as category, f.format_name as form');
+    // $this->db->select('s.st_id as stock_id, s.st_code as stock_token, s.st_unit_value as unit_value, s.st_total as total, s.st_usage as usage, DATE_FORMAT(s.st_date_created, "%M %d %Y") as entry, u.mu_name as unit_title, u.mu_unit as unit_name, m.med_name as medicine1, m.med_alias as medicine2, c.medcat_name as category, f.format_name as form');
+    $this->db->select('s.st_id as stock_id, s.st_code as stock_token, s.st_unit_value as unit_value, SUM(s.st_total) as total, SUM(s.st_usage) as usage_, DATE_FORMAT(s.st_date_created, "%M %d %Y") as entry, u.mu_name as unit_title, u.mu_unit as unit_name, m.med_name as medicine1, m.med_alias as medicine2, c.medcat_name as category, f.format_name as form');
     $this->db->join('stock_batches b', 'b.sb_id = s.st_batch', 'left');
     $this->db->join('medicine_units u', 'u.mu_token = s.st_unit', 'left');
     $this->db->join('medicines m', 'm.med_token = s.st_medicine', 'left');
@@ -503,22 +505,31 @@ public function get_Stock_Medicines($keyword)
 
     $this->db->or_group_start();
     $this->db->like('u.mu_unit', $keyword);
+
+    $this->db->or_group_start();
+    $this->db->like('u.mu_name', $keyword);
+
+    $this->db->or_group_start();
+    $this->db->like('s.st_unit_value', $keyword);
     
     $this->db->group_end();
     $this->db->group_end();
     $this->db->group_end();
     $this->db->group_end();
     $this->db->group_end();
+    $this->db->group_end();
+    $this->db->group_end();
+    $this->db->group_by(array("s.st_medicine", "s.st_unit", "s.st_unit_value"));
 
-    $this->db->order_by('s.st_date_created');
+    // $this->db->order_by('s.st_date_created', "DESC");
 
     $query = $this->db->get('stock s');
     $data = array();
     foreach($query->result() as $row)
     {
-        if($row->usage < $row->total)
+        if($row->usage_ < $row->total)
         {
-            $row->available = $row->total - $row->usage;
+            $row->available = $row->total - $row->usage_;
             $data[] = $row;
         }
     }

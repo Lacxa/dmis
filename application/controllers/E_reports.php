@@ -1124,38 +1124,38 @@ class E_reports extends CI_Controller {
 	{
 		if($this->session->userdata('user_isIncharge') || $this->session->userdata('user_role') == 'SUPER' || $this->session->userdata('user_role') == 'ADMIN')
 		{
-			try{
-				$this->load->helper('file');
-				$this->load->dbutil();
-				$preferences = array(
-					'format' => 'zip',
-					'filename' => 'DMIS-Database-Backup_' . date('Y-m-d_H-i')
-				);
-				$backup = $this->dbutil->backup($preferences);
-				$backup_name = 'DMIS-Database-Backup' . '.zip';
-				$backup_path = FCPATH.'uploads/db-backup/' . $backup_name;
-				if (!write_file($backup_path, $backup))
-				{
-					echo json_encode(array("status" => FALSE, 'data' => '<code>Error</code>'));
-					exit();
-				}
-				else
-				{
-					clearstatcache();
-					$size = filesize($backup_path);
-					if($size != FALSE) $size = $this->formatSizeUnits($size);
+			try {
 
-					$data = array(
-						'db_id' => 1,
-						'db_file' => $backup_name,
-						'db_size' => $size,
-						'db_author' => $this->session->userdata('user_pf'),
-					);
-					$this->employee_model->update_db_backup($data);
-					
-					echo json_encode(array("status" => TRUE, 'data' => '<span class="text-success">Success</span>'));
-					exit();
-				}
+				ini_set('display_errors', 1);
+				ini_set('display_startup_errors', 1);
+				error_reporting(E_ALL);
+
+				$database = $this->db->database;
+				$user = $this->db->username;
+				$pass = $this->db->password;
+				$host = $this->db->hostname;
+				$dir = FCPATH.'uploads/db-backup/';
+				$filename = 'DMIS-Database-Backup.sql.gz';
+
+				$return_var = NULL;
+				$output = NULL;
+				$command = "/usr/bin/mysqldump -u {$user} -p{$pass} -h {$host} {$database} | gzip > {$dir}{$filename}";
+				// exec($command, $output, $return_var);
+				exec($command);
+				clearstatcache();
+				$size = filesize($dir . $filename);
+				if($size != FALSE) $size = $this->formatSizeUnits($size);
+
+				$data = array(
+					'db_id' => 1,
+					'db_file' => $filename,
+					'db_size' => $size,
+					'db_author' => $this->session->userdata('user_pf'),
+				);
+				$this->employee_model->update_db_backup($data);
+				
+				echo json_encode(array("status" => TRUE, 'data' => '<span class="text-success">Success</span>'));
+				exit();
 			}
 			catch (\Throwable $th) {
 				echo json_encode(array("status" => FALSE, 'data' => $th->getMessage()));
@@ -1167,7 +1167,9 @@ class E_reports extends CI_Controller {
 	public function download_database_backup()
 	{
 		$this->load->helper('download');
-		$backup_path = FCPATH.'uploads/db-backup/DMIS-Database-Backup' . '.zip';
+		$dir = FCPATH.'uploads/db-backup/';
+		$filename = 'DMIS-Database-Backup.sql.gz';
+		$backup_path = $dir . $filename;
 		force_download($backup_path, NULL);
 	}
 	

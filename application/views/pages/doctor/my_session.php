@@ -881,7 +881,7 @@ $('div#medicine-selection input#search_medicine').keyup(function() {
                                     if(value.stock_token == "10000001") {
                                           str = `${value.medicine1} (${value.medicine2})`;
                                     } else {
-                                          str = `<code>${value.medicine1} (${value.medicine2})</code> | ${value.category} | ${value.form} | ${value.unit_title}:&nbsp;${value.unit_value}&nbsp;${value.unit_name} | ${value.entry} <span class="badge bg-danger badge-number">${value.total == value.available ? value.available : '<span style="text-decoration: line-through;">'+value.total+'</span> : '+value.available+'</span>'}`;
+                                          str = `<code>${value.medicine1} (${value.medicine2})</code> | ${value.category} | ${value.form} | ${value.unit_title}:&nbsp;${value.unit_value}&nbsp;${value.unit_name} <span class="badge bg-danger badge-number">${value.total == value.available ? value.available : '<span style="text-decoration: line-through;">'+value.total+'</span> : '+value.available+'</span>'}`;
                                     }
                                     $("#medicine_result").append(`
                                           <a href="#" name="saveMedicineLink" data-id="${value.stock_token}" data-title="${value.medicine1} (${value.medicine2})" class="list-group-item list-group-item-action">${str}</a>
