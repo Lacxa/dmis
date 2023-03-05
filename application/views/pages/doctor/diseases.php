@@ -53,19 +53,51 @@ $csrf = array(
             </button>
           </div>
 
-            <table id="table_diseases" class="table table-striped table-sm nowrap" style="width:100%">
-              <thead>
-                <tr>
-                  <th scope="col">#</th>
-                  <th scope="col">Title</th>
-                  <th scope="col">Code</th>
-                  <th scope="col">Communicable</th>
-                  <th scope="col">Author</th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
+          <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="diseaseList-tab" data-bs-toggle="tab" data-bs-target="#diseaseList" type="button" role="tab" aria-controls="diseaseList" aria-selected="true">Disease List
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="diseaseGroups-tab" data-bs-toggle="tab" data-bs-target="#diseaseGroups" type="button" role="tab" aria-controls="diseaseGroups" aria-selected="false">Disease Groups
+              </button>
+            </li>
+          </ul>
+
+          <div class="tab-content pt-2" id="myTabContent">
+            <div class="tab-pane fade show active" id="diseaseList" role="tabpanel" aria-labelledby="diseaseList-tab">
+              <div class="table-responsive">
+                <table id="table_disease_list" class="table table-striped table-sm nowrap" style="width:100%">
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Title</th>
+                      <th scope="col">Code</th>
+                      <th scope="col">Group</th>
+                      <th scope="col">Communicable</th>
+                      <th scope="col">Author</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="diseaseGroups" role="tabpanel" aria-labelledby="diseaseGroups-tab">
+              <table id="table_disease_groups" class="table table-striped table-sm nowrap" style="width:100%">
+                <thead>
+                  <tr>
+                    <!-- <th scope="col">#</th> -->
+                    <th scope="col">Range</th>
+                    <th scope="col">Keywords</th>
+                    <th scope="col">Descriptions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+            </div>
+          </div>          
 
         </div>
       </div>
@@ -81,7 +113,7 @@ $csrf = array(
 
 <script type="text/javascript">
   $(function() {
-    
+
     // Number only input
     $('.numberonly').keypress(function (e) {
       var charCode = (e.which) ? e.which : event.keyCode
@@ -89,166 +121,211 @@ $csrf = array(
         return false;
     });
 
-  // Retrieve diseases data on page load
-  const title = 'List of common patient diseases'
-  var table_diseases = $('#table_diseases').DataTable({
-    oLanguage: {
-      sProcessing: "loading...",      
-      sLengthMenu: 'Show <select class="form-select">'+
-      '<option value="10">10</option>'+
-      '<option value="50">50</option>'+
-      '<option value="100">100</option>'+
-      '<option value="500">500</option>'+
-      '<option value="-1">All</option>'+
-      '</select> records'
-    },
-    responsive: true,
-    "processing":true,
-    "serverSide":true, 
-    "order":[],
-    "ajax": {
-      url : "<?php echo base_url('disease/get-diseases');?>",
-      type : 'POST'
-    },
-    "ordering": false,
-    "dom": 'Blfrtip',
-    "buttons": [
-    {
-      extend: "copy",
-      title: title,
-    },
-    {
-      extend: "excel",
-      title: title,
-    },
-    {
-      extend: "csv",
-      title: title,
-    },
-    {
-      extend: "pdf",
-      title: title,
-    },
-    {
-      extend: "print",
-      title: title,
-    },
-    ],
-  });
+    // Retrieve diseases data on page load
+    const title = 'List of common patient diseases'
+    var table_disease_list = $('#table_disease_list').DataTable({
+      oLanguage: {
+        sProcessing: "loading...",      
+        sLengthMenu: 'Show <select class="form-select">'+
+        '<option value="10">10</option>'+
+        '<option value="50">50</option>'+
+        '<option value="100">100</option>'+
+        '<option value="500">500</option>'+
+        '<option value="-1">All</option>'+
+        '</select> records'
+      },
+      responsive: true,
+      "processing":true,
+      "serverSide":true, 
+      "order":[],
+      "ajax": {
+        url : "<?php echo base_url('disease/get-diseases');?>",
+        type : 'POST'
+      },
+      "ordering": false,
+      "dom": 'Blfrtip',
+      "buttons": [
+      {
+        extend: "copy",
+        title: title,
+      },
+      {
+        extend: "excel",
+        title: title,
+      },
+      {
+        extend: "csv",
+        title: title,
+      },
+      {
+        extend: "pdf",
+        title: title,
+      },
+      {
+        extend: "print",
+        title: title,
+      },
+      ],
+    });
 
-
-// Save disease
-$("#disease_form").validate({
-  errorPlacement: function(error, element) {
-    error.addClass('text-danger');
-  },
-  debug: false,
-  errorClass: "is-invalid",
-  validClass: "is-valid",
-  errorElement: "div",
-  rules: { 
-    name: { required: true },
-    token: { required: true },
-    category: { required: true, number: true },
+    // Save disease
+    $("#disease_form").validate({
+      errorPlacement: function(error, element) {
+        error.addClass('text-danger');
+      },
+      debug: false,
+      errorClass: "is-invalid",
+      validClass: "is-valid",
+      errorElement: "div",
+      rules: { 
+        name: { required: true },
+        token: { required: true },
+        category: { required: true, number: true },
     // alias: { required: true },
-  },
-    highlight: function( element, errorClass, validClass ) {
-      $(element).addClass(errorClass).removeClass(validClass);
-    },
-    unhighlight: function( element, errorClass, validClass ) {
-      $(element).removeClass(errorClass).addClass(validClass);
-    },
-    submitHandler: function () {
-    var dialog = bootbox
-    .dialog({
-      message:
-      '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Please wait...</div>',
-      closeButton: false,
-    })
-    .on("shown.bs.modal", function () {
-      var formdata = $("#disease_form").serialize();
-      $.ajax({
-        url: '<?php echo base_url('disease/add-disease');?>',
-        type: "POST",
-        data: formdata,
-        dataType: "JSON",
-        success: function (response) {
-          table_diseases.ajax.reload();
-          if (response.status) {
-            $("#disease_form")[0].reset();
-            $('#addDiseaseCollapse').collapse('hide');
-            bootbox.alert(response.data.toString(), function () {
-              dialog.modal("hide");
-            });
-          } else {
-            bootbox.alert(response.data.toString(), function () {
-              dialog.modal("hide");
+      },
+      highlight: function( element, errorClass, validClass ) {
+        $(element).addClass(errorClass).removeClass(validClass);
+      },
+      unhighlight: function( element, errorClass, validClass ) {
+        $(element).removeClass(errorClass).addClass(validClass);
+      },
+      submitHandler: function () {
+        var dialog = bootbox
+        .dialog({
+          message:
+          '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Please wait...</div>',
+          closeButton: false,
+        })
+        .on("shown.bs.modal", function () {
+          var formdata = $("#disease_form").serialize();
+          $.ajax({
+            url: '<?php echo base_url('disease/add-disease');?>',
+            type: "POST",
+            data: formdata,
+            dataType: "JSON",
+            success: function (response) {
+              table_disease_list.ajax.reload();
+              if (response.status) {
+                $("#disease_form")[0].reset();
+                $('#addDiseaseCollapse').collapse('hide');
+                bootbox.alert(response.data.toString(), function () {
+                  dialog.modal("hide");
+                });
+              } else {
+                bootbox.alert(response.data.toString(), function () {
+                  dialog.modal("hide");
+                });
+              }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              bootbox.alert(errorThrown.toString(), function () {
+                dialog.modal("hide");
+              });
+            },
+          });
+        });
+      },
+    });
+
+
+    $("#table_disease_list tbody").on('click', 'button', function() {
+      var id = $(this).attr('data-id');
+      var disease = $(this).attr('data-text');
+      var action = this.name;
+
+      if(action == "comButton" || action == "notComButton") {
+        const message = action == "comButton" ? 'communicable' : 'non-communicable';
+        const state = action == "comButton" ? 1 : 0;
+
+        bootbox.confirm({
+          message: `Set ${message} a medicine with title <code>${disease}</code>?`,
+          buttons: {
+            confirm: {
+              label: '<i class="fa fa-check"></i> Agree',
+              className: "btn-success",
+            },
+            cancel: {
+              label: '<i class="fa fa-times"></i> Disagree',
+              className: "btn-danger",
+            },
+          },
+          callback: function (result) {
+            if (result == true) {
+             var dialog = bootbox.dialog({
+              message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Please wait...</div>',
+              closeButton: false,
+            }).on("shown.bs.modal", function () {
+              $.ajax({
+                url: '<?php echo base_url('disease/communicable-state/');?>'+state+'/'+id,
+                type: "POST",
+                data: {},
+                dataType: "JSON",
+                success: function (response) {
+                  bootbox.alert(response.data.toString(), function () {
+                    table_disease_list.ajax.reload();
+                    dialog.modal("hide");
+                  });
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                  bootbox.alert(errorThrown.toString(), function () {
+                    table_disease_list.ajax.reload();
+                    dialog.modal("hide");
+                  });
+                },
+              });
             });
           }
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-          bootbox.alert(errorThrown.toString(), function () {
-            dialog.modal("hide");
-          });
-        },
+        }
       });
+      }
     });
-  },
-});
 
 
-$("#table_diseases tbody").on('click', 'button', function() {
- var id = $(this).attr('data-id');
- var disease = $(this).attr('data-text');
- var action = this.name;
-
- if(action == "comButton" || action == "notComButton") {
-  const message = action == "comButton" ? 'communicable' : 'non-communicable';
-  const state = action == "comButton" ? 1 : 0;
-
-  bootbox.confirm({
-    message: `Set ${message} a medicine with title <code>${disease}</code>?`,
-    buttons: {
-      confirm: {
-        label: '<i class="fa fa-check"></i> Agree',
-        className: "btn-success",
+    const groups_title = 'List of disease groups';
+    $('#table_disease_groups').DataTable({
+      oLanguage: {
+        sProcessing: "loading...",      
+        sLengthMenu: 'Show <select class="form-select">'+
+        '<option value="10">10</option>'+
+        '<option value="50">50</option>'+
+        '<option value="100">100</option>'+
+        '<option value="500">500</option>'+
+        '<option value="-1">All</option>'+
+        '</select> records'
       },
-      cancel: {
-        label: '<i class="fa fa-times"></i> Disagree',
-        className: "btn-danger",
+      responsive: true,
+      "processing":true,
+      "serverSide":true, 
+      "order":[],
+      "ajax": {
+        url : "<?php echo base_url('disease/disease-groups');?>",
+        type : 'POST'
       },
-    },
-    callback: function (result) {
-      if (result == true) {
-       var dialog = bootbox
-       .dialog({
-        message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Please wait...</div>',
-        closeButton: false,
-      }).on("shown.bs.modal", function () {
-        $.ajax({
-          url: '<?php echo base_url('disease/communicable-state/');?>'+state+'/'+id,
-          type: "POST",
-          data: {},
-          dataType: "JSON",
-          success: function (response) {
-            bootbox.alert(response.data.toString(), function () {
-              table_diseases.ajax.reload();
-              dialog.modal("hide");
-            });
-          },
-          error: function (jqXHR, textStatus, errorThrown) {
-            bootbox.alert(errorThrown.toString(), function () {
-              table_diseases.ajax.reload();
-              dialog.modal("hide");
-            });
-          },
-        });
-      });
-    }
-  }
-});
- }
-});
+      "ordering": false,
+      "dom": 'Blfrtip',
+      "buttons": [
+      {
+        extend: "copy",
+        title: groups_title,
+      },
+      {
+        extend: "excel",
+        title: groups_title,
+      },
+      {
+        extend: "csv",
+        title: groups_title,
+      },
+      {
+        extend: "pdf",
+        title: groups_title,
+      },
+      {
+        extend: "print",
+        title: groups_title,
+      },
+      ],
+    });
 
-});
+  });
 </script>

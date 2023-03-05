@@ -92,6 +92,12 @@ class Reception extends CI_Controller {
         return $this->patient_model->checkIfFileNumberExist($number);
     }
     
+    public function getLastFileNumber()
+    {
+        $last = $this->patient_model->getLastFileNumber();
+        echo $last;
+    }
+    
     private function get_id_by_file_number($file_number)
     {
         $data = $this->patient_model->get_id_by_file_number($file_number);
@@ -140,8 +146,21 @@ class Reception extends CI_Controller {
     {
         return $this->patient_model->check_if_uuid_exist_visit_table($uuid);
     }
-    ###########################################################
-    ###########################################################
+
+    public function generateNextNumber($previous)
+    {
+        $cleaned = str_replace("-", "", $previous);
+
+        $next = sprintf("%'.06d\n", intval($cleaned) + 1);
+        $split = str_split(trim($next), 2);
+        $formatted_next = implode("-", $split);
+        
+        return $formatted_next;
+    }
+
+    #######################################################################
+    ##########   PRIVATE FUNCTIONS   ######################################
+    #######################################################################
     
     
     
@@ -261,7 +280,7 @@ class Reception extends CI_Controller {
                     $patient_file_no = $this->security->xss_clean($this->input->post('file_no'));
                     
                     if(!empty($patient_file_no))
-                    {                        
+                    {
                         $patient_to_update = $this->get_id_by_file_number($patient_file_no);
                         if($patient_to_update == FALSE)
                         {

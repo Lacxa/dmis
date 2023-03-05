@@ -490,6 +490,7 @@ public function get_Stock_Medicines($keyword)
     $this->db->join('medicine_categories c', 'c.medcat_token = m.med_category', 'left');
     $this->db->join('medicine_formats f', 'f.format_token = m.med_format', 'left');
     $this->db->where('b.sb_active', 1);
+    $this->db->where('s.st_usage < s.st_total');
     
     $this->db->group_start();
     $this->db->like('m.med_name', $keyword);
@@ -527,11 +528,8 @@ public function get_Stock_Medicines($keyword)
     $data = array();
     foreach($query->result() as $row)
     {
-        if($row->usage_ < $row->total)
-        {
-            $row->available = $row->total - $row->usage_;
-            $data[] = $row;
-        }
+        $row->available = $row->total - $row->usage_;
+        $data[] = $row;
     }
     $data[] = array(
         'stock_token' => '10000001',

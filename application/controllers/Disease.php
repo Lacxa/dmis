@@ -121,6 +121,7 @@ class Disease extends CI_Controller {
 				$i,
 				$r->text,
 				$r->code,
+				$r->group_range,
 				$r->category_code == 200 ? $comBtn : $notComBtn,
 				$r->author,
 			);
@@ -130,6 +131,39 @@ class Disease extends CI_Controller {
 			"draw" => $draw,
 			"recordsTotal" => $this->disease_model->countAll(),
 			"recordsFiltered" => $this->disease_model->countFiltered($this->input->post()),
+			"data" => $data
+		);
+		
+		echo json_encode($result);
+		exit();
+	}
+	
+	public function get_disease_groups()
+	{
+		$data = [];
+		
+		$draw = intval($this->input->post("draw"));
+		$start = intval($this->input->post("start"));
+		$length = intval($this->input->post("length"));
+		
+		$result = $this->disease_model->get_disease_groups($this->input->post());
+		
+		$i = $this->input->post("start");
+		foreach($result as $r)
+		{
+			$i++;
+			$data[] = array(
+				// $i,
+				$r->group_range,
+				'<code>' . $r->keywords . '</code>',
+				!empty($r->descriptions) ? $r->descriptions : 'Not set',
+			);
+		}
+		
+		$result = array(
+			"draw" => $draw,
+			"recordsTotal" => $this->disease_model->countAllDiseaseGroups(),
+			"recordsFiltered" => $this->disease_model->countFilteredDiseaseGroups($this->input->post()),
 			"data" => $data
 		);
 		
@@ -398,7 +432,7 @@ class Disease extends CI_Controller {
 					else 
 					{
 						$list [] = [
-							'dis_title'	=> $col1,
+							'dis_title'	=> ucfirst($col1),
 							'dis_token' => $col2,
 							'dis_author' => $this->session->userdata('user_pf')
 						];

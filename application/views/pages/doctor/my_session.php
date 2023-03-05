@@ -283,9 +283,12 @@ $csrf = array(
                                     $("div#profile-overview div#weight").html(`<code>${data.rec_weight+' kg'}</code>`);
                                     $("div#profile-overview div#height").html(`<code>${data.rec_height+' cm'}</code>`);
                                     $("div#profile-overview div#bmi_value").html(`<code>${data.bmi}</code>`);
-                                    $("div#profile-overview div#temeperature").html(`<code>${data.rec_temeperature+' &deg;C'}</code>`);                  
+                                    $("div#profile-overview div#temeperature").html(`<code>${data.rec_temeperature+' &deg;C'}</code>`);
+
                                     $("div#phy_exam div#quillArea div.ql-editor").html("");
-                                    $("div#phy_exam div#quillArea div.ql-editor").html(`<code>${data.sy_descriptions}</code>`);
+                                    if(data.sy_descriptions){
+                                          $("div#phy_exam div#quillArea div.ql-editor").html(`${data.sy_descriptions}`);
+                                    }
                                     
                                     $('div#session_ids input#session_record_id').val(data.sy_record_id);
                                     $('div#session_ids input#session_symptom_id').val(data.sy_id);

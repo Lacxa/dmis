@@ -125,6 +125,16 @@ class Patient_model extends CI_Model {
         $query = $this->db->get('patient');
         return $query->num_rows() > 0;
     }
+
+    public function getLastFileNumber()
+    {
+        // SELECT MAX(CAST(SUBSTRING(invoice_number, 4, length(invoice_number)-3) AS UNSIGNED)) FROM table
+
+        $this->db->select_max('pat_file_no', 'last_pf');
+        $query = $this->db->get('patient');
+        $data = $query->result_array();
+        return $data[0]['last_pf'];
+    }
     
     public function update_patient_records($data, $id)
     {

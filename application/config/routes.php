@@ -62,6 +62,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     $route['disease'] = 'disease';
     $route['disease/search'] = 'disease/search';
     $route['disease/get-diseases']['post'] = 'disease/get_diseases';
+    $route['disease/disease-groups']['post'] = 'disease/get_disease_groups';
     $route['disease/add-disease']['post'] = 'disease/add_disease';
     $route['disease/disease-categories'] = 'disease/disease_categories';
     $route['disease/add-disease-category']['post'] = 'disease/add_disease_category';
@@ -85,6 +86,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     
     // Authentication routes
     $route['password'] = 'home/generate_password';
+    $route['sequential-number/(:any)'] = 'reception/generateNextNumber/$1';
     $route['login'] = 'home/login';
     $route['sign-out'] = 'home/logout';
     $route['password/change/(:num)/(:any)']['get'] = 'home/change_password/$1/$2';
