@@ -889,8 +889,7 @@ class E_reports extends CI_Controller {
 	public function incomplete_patients($header)
 	{
 		if($this->input->server('REQUEST_METHOD') === 'POST')
-		{
-			
+		{			
 			if($this->session->userdata('user_isIncharge') || $this->session->userdata('user_role') == 'SUPER' || $this->session->userdata('user_role') == 'ADMIN')
 			{
 				$data = [];
@@ -1171,6 +1170,97 @@ class E_reports extends CI_Controller {
 		$filename = 'DMIS-Database-Backup.sql.gz';
 		$backup_path = $dir . $filename;
 		force_download($backup_path, NULL);
+	}
+
+	public function general_report($header)
+	{
+		if($this->session->userdata('user_isIncharge') || $this->session->userdata('user_role') == 'SUPER' || $this->session->userdata('user_role') == 'ADMIN')
+		{
+			$data = array(
+				'title' => 'General Report',
+				'header' => @$header,
+				'heading' => 'Pro',
+				'subHeading' => 'General Report',
+			);
+			$this->load->view('pages/e_reports/general_report', $data);
+		}
+		else
+		{
+			$this->session->set_flashdata('error', 'No access');
+			return redirect($_SERVER['HTTP_REFERER']);
+		}
+	}
+
+	public function age_gender()
+	{
+		$this->form_validation->set_rules('start', 'Start Date', 'trim|required');
+		$this->form_validation->set_rules('end', 'End Date', 'trim|required');
+		
+		if ($this->form_validation->run() == FALSE)
+		{
+			$this->session->set_flashdata('error', validation_errors());
+			return redirect($_SERVER['HTTP_REFERER']);
+		}
+		else
+		{
+			$start = date('Y-m-d', strtotime($this->security->xss_clean($this->input->post('start'))));
+			$end = date('Y-m-d', strtotime($this->security->xss_clean($this->input->post('end'))));
+
+			$group_1 = [0, 1];
+			$group_2 = [1, 5];
+			$group_3 = [5, 60];
+			$group_4 = [60, 0];
+
+			$res_group_1 = $this->patient_model->age_gender_report($start, $end, $group_1);
+			$res_group_2 = $this->patient_model->age_gender_report($start, $end, $group_2);
+			$res_group_3 = $this->patient_model->age_gender_report($start, $end, $group_3);
+			$res_group_4 = $this->patient_model->age_gender_report($start, $end, $group_4);
+
+			$result = array(
+				'group_1' => $res_group_1,
+				'group_2' => $res_group_2,
+				'group_3' => $res_group_3,
+				'group_4' => $res_group_4,
+			);			
+			echo json_encode(array("status" => TRUE, 'data' => $result));
+			exit();
+		}
+	}
+
+	public function disease_distribution()
+	{
+		$this->form_validation->set_rules('start', 'Start Date', 'trim|required');
+		$this->form_validation->set_rules('end', 'End Date', 'trim|required');
+		
+		if ($this->form_validation->run() == FALSE)
+		{
+			$this->session->set_flashdata('error', validation_errors());
+			return redirect($_SERVER['HTTP_REFERER']);
+		}
+		else
+		{
+			$start = date('Y-m-d', strtotime($this->security->xss_clean($this->input->post('start'))));
+			$end = date('Y-m-d', strtotime($this->security->xss_clean($this->input->post('end'))));
+
+			// $group_1 = [0, 1];
+			// $group_2 = [1, 5];
+			// $group_3 = [5, 60];
+			// $group_4 = [60, 0];
+
+			$res_group_1 = $this->patient_model->disease_distribution_report($start, $end);
+			// $res_group_2 = $this->patient_model->disease_distribution_report($start, $end, $group_2);
+			// $res_group_3 = $this->patient_model->disease_distribution_report($start, $end, $group_3);
+			// $res_group_4 = $this->patient_model->disease_distribution_report($start, $end, $group_4);
+
+			// $result = array(
+			// 	'group_1' => $res_group_1,
+			// 	'group_2' => $res_group_2,
+			// 	'group_3' => $res_group_3,
+			// 	'group_4' => $res_group_4,
+			// );			
+			echo json_encode(array("status" => TRUE, 'data' => $res_group_1));
+			exit();
+		}
 	}
 	
 }

@@ -2,6 +2,9 @@
 
 <!-- ======= Footer ======= -->
 <footer id="footer" class="footer">
+  <div class="copyright">
+    &copy; Copyright 2022-<?php echo date("Y") ?> <strong><span><a href="https://nit.ac.tz/" target="_blank">National Institute of Transport</a></span></strong>. All Rights Reserved
+  </div>
   <div class="credits">
     Developed by <a target="_blank" href="https://nit.ac.tz/index.php/mis-2/">NIT MIS DEPARTMENT</a>
   </div>
@@ -79,57 +82,57 @@
         setInterval(function(){
           session_counter();
         }, 6000);
-        <?php } else if($this->session->userdata('user_role') == 'PH') { ?>
-          function prescription_counter(){
-            $.ajax({
-              url: "<?php echo base_url('pharmacy/ajax-count-prescription'); ?>",
-              type: "POST",
-              dataType: "json",
-              success: function (response) {
-                if(response.status){
-                  const res = response.data;
-                  if(res > 0){
-                    $('.prescription-counter').text(res);
-                  }else{
-                    $('.prescription-counter').text("");
-                  }
+      <?php } else if($this->session->userdata('user_role') == 'PH') { ?>
+        function prescription_counter(){
+          $.ajax({
+            url: "<?php echo base_url('pharmacy/ajax-count-prescription'); ?>",
+            type: "POST",
+            dataType: "json",
+            success: function (response) {
+              if(response.status){
+                const res = response.data;
+                if(res > 0){
+                  $('.prescription-counter').text(res);
+                }else{
+                  $('.prescription-counter').text("");
                 }
               }
-            });
+            }
+          });
         }
 
         prescription_counter();
         setInterval(function(){
           prescription_counter();
         }, 7000);        
-          <?php } else if($this->session->userdata('user_role') == 'LAB') { ?>
-            function lab_patients_counter(){
-              $.ajax({
-                url: "<?php echo base_url('lab/ajax-count-patients'); ?>",
-                type: "POST",
-                dataType: "json",
-                success: function (response) {
-                  if(response.status){
-                    const res = response.data;
-                    if(res > 0){
-                      $('.patients-counter').text(res);
-                    }else{
-                      $('.patients-counter').text("");
-                    }
-                  }
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                  // console.log(jqXHR);
+      <?php } else if($this->session->userdata('user_role') == 'LAB') { ?>
+        function lab_patients_counter(){
+          $.ajax({
+            url: "<?php echo base_url('lab/ajax-count-patients'); ?>",
+            type: "POST",
+            dataType: "json",
+            success: function (response) {
+              if(response.status){
+                const res = response.data;
+                if(res > 0){
+                  $('.patients-counter').text(res);
+                }else{
+                  $('.patients-counter').text("");
                 }
-              });
-          }
+              }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                  // console.log(jqXHR);
+            }
+          });
+        }
 
+        lab_patients_counter();
+        setInterval(function(){
           lab_patients_counter();
-          setInterval(function(){
-            lab_patients_counter();
-          }, 7000);        
-          <?php } ?>
-      });
+        }, 7000);        
+      <?php } ?>
+    });
   </script>
 
 </body>

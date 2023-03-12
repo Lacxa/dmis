@@ -4,8 +4,8 @@ $error = $this->session->flashdata('error');
 $success = $this->session->flashdata('success');
 
 $csrf = array(
-        'name' => $this->security->get_csrf_token_name(),
-        'hash' => $this->security->get_csrf_hash()
+  'name' => $this->security->get_csrf_token_name(),
+  'hash' => $this->security->get_csrf_hash()
 );
 ?>
 
@@ -118,9 +118,13 @@ $csrf = array(
                 </div>
               </div>
 
+              <!-- <div class="copyright text-center">
+                &copy; Copyright 2022-<g?php echo date("Y") ?> <strong><span><a href="https://nit.ac.tz/" target="_blank">National Institute of Transport</a></span></strong>. All Rights Reserved
+              </div>
+
               <div class="credits">
                 Developed by <a target="_blank" href="https://nit.ac.tz/index.php/mis-2/">NIT MIS DEPARTMENT</a>
-              </div>
+              </div> -->
 
             </div>
           </div>
@@ -133,8 +137,8 @@ $csrf = array(
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-<!-- JQUERY JS File -->
-<script src="<?php echo base_url('assets/js/jquery.min.js'); ?>"></script>
+  <!-- JQUERY JS File -->
+  <script src="<?php echo base_url('assets/js/jquery.min.js'); ?>"></script>
 
   <!-- Vendor JS Files -->
   <script src="<?php echo base_url('assets/vendor/apexcharts/apexcharts.min.js'); ?>"></script>
@@ -150,23 +154,23 @@ $csrf = array(
   <script src="<?php echo base_url('assets/js/main.js'); ?>"></script>
 
   <script type="text/javascript">
-  $(function() {
+    $(function() {
 
-    $(".show-password, .hide-password").on('click', function() {
+      $(".show-password, .hide-password").on('click', function() {
         var passwordId = $(this).parents('div:first').find('input').attr('id');
         if ($(this).hasClass('show-password')) {
           $("#" + passwordId).attr("type", "text");
           $(this).parent().find(".show-password").hide();
           $(this).parent().find(".hide-password").show();
-      } else {
+        } else {
           $("#" + passwordId).attr("type", "password");
           $(this).parent().find(".hide-password").hide();
           $(this).parent().find(".show-password").show();
-      }
-  });
+        }
+      });
 
-});
-</script>
+    });
+  </script>
 
 </body>
 

@@ -100,6 +100,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     $route['reception/patient-registration'] = 'reception/register_patient';
     $route['reception/search-patient'] = 'reception/search_patient';
     $route['reception/get-patient-by-id'] = 'reception/get_patient_by_id';
+    $route['reception/client-latest-vitals/(:any)'] = 'reception/client_latest_vitals/$1';
     $route['reception/patient-preliminaries'] = 'reception/patient_preliminaries';
     $route['reception/delete-patient/(:any)']['post'] = 'reception/delete_patient/$1';
     $route['reception/delete-previous-patient/(:any)']['post'] = 'reception/delete_patient_2/$1';
@@ -194,6 +195,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     $route['reports/db-backup/(:any)'] = "e_reports/database_backup/$1";
     $route['reports/start-db-backup'] = "e_reports/start_database_backup/$1";
     $route['reports/download-db-backup'] = "e_reports/download_database_backup";
+    $route['reports/general-report/(:any)'] = "e_reports/general_report/$1";
+    $route['reports/age-gender'] = "e_reports/age_gender";
+    $route['reports/disease-distribution'] = "e_reports/disease_distribution";
     
     // Pharmacy routes
     $route['pharmacy'] = 'pharmacy';

@@ -507,6 +507,11 @@ $csrf = array(
                           <i class="bi bi-circle"></i><span>Database Backup</span>
                         </a>
                       </li>
+                      <li>
+                        <a href="<?php echo base_url('reports/general-report/'.@$header);?>">
+                          <i class="bi bi-circle"></i><span>General Report</span>
+                        </a>
+                      </li>
                     </ul>
                   </li>
                 <?php } ?>

@@ -2162,6 +2162,21 @@ class Patient_model extends CI_Model {
 
     }
 
+    public function get_latest_vitals($patient_id)
+    {
+        $this->db->select('rec_patient_id as id, rec_blood_pressure as bp, rec_pulse_rate as pr, rec_weight as weight, rec_height as height, rec_temeperature as temp, rec_respiration as resp');
+        $this->db->where('rec_patient_id', $patient_id);
+        $this->db->where('rec_blood_pressure is NOT NULL', NULL, FALSE);
+        $this->db->where('rec_pulse_rate is NOT NULL', NULL, FALSE);
+        $this->db->where('rec_weight is NOT NULL', NULL, FALSE);
+        $this->db->where('rec_height is NOT NULL', NULL, FALSE);
+        $this->db->where('rec_temeperature is NOT NULL', NULL, FALSE);
+        $this->db->where('rec_respiration is NOT NULL', NULL, FALSE);
+        $this->db->order_by('rec_regdate', 'DESC');
+        $query = $this->db->get('patient_record')->row_array();
+        return $query;
+    }
+
     public function client_report($record_id)
     {
         $this->db->from('patient_record r');
@@ -3068,5 +3083,46 @@ public function countFilteredAllIncompletePatients($postData)
     $query = $this->db->get();
     return $query->num_rows();
 }
+
+public function age_gender_report($start, $end, $group)
+{
+    $this->db->select('COUNT(CASE WHEN p.pat_gender = "MALE" THEN r.rec_id END) AS males, COUNT(CASE WHEN p.pat_gender = "FEMALE" THEN r.rec_id END) AS females, COUNT(*) AS total');
+    $this->db->join('patient p', 'p.pat_id = r.rec_patient_id', 'left');
+    $this->db->join('patient_visit v', 'v.vs_record_id = r.rec_id', 'left');
+    if($group[0] != 0)
+    $this->db->where('ABS(TIMESTAMPDIFF(YEAR, CURRENT_DATE(), p.pat_dob)) >=', $group[0]);
+    if($group[1] != 0)
+    $this->db->where('ABS(TIMESTAMPDIFF(YEAR, CURRENT_DATE(), p.pat_dob)) <=', $group[1]);
+    $this->db->where('DATE(r.rec_regdate) >=', $start);
+    $this->db->where('DATE(r.rec_regdate) <=', $end);
+    $this->db->where('v.vs_visit', 'nimetoka_ph');
+
+    $query = $this->db->get('patient_record r');
+    $data = $query->result();
+     
+    return $data;
+}
+
+public function disease_distribution_report($start, $end)
+{
+    $this->db->select('dis_title as name, dis_token as code');
+    $query = $this->db->get('diseases')->result_array();
+    $data = [];
+    foreach ($query as $key => $row)
+    {
+        $this->db->select('COUNT(CASE WHEN p.pat_occupation = "STUDENT" THEN s.sy_id END) AS students, COUNT(CASE WHEN p.pat_occupation = "EMPLOYEE" THEN s.sy_id END) AS employees, COUNT(CASE WHEN p.pat_occupation = "OTHER" THEN s.sy_id END) AS others, COUNT(*) AS total');
+        $this->db->join('patient p', 'p.pat_file_no = s.sy_record_patient_pf', 'left');
+        $this->db->like('s.sy_diseases', $row['code']);
+        $sub_query = $this->db->get('patient_symptoms s')->result_array();
+        if($sub_query[0]['students'] > 0 || $sub_query[0]['employees'] > 0 || $sub_query[0]['others'] > 0)
+        {
+            $row['patients'] = $sub_query;
+            $data[] = $row;
+        }
+    }     
+    return $data;
+}
+
+
 }
 ?>

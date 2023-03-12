@@ -3,8 +3,8 @@
 $this->load->view('templates/base_header.php');
 
 $csrf = array(
-        'name' => $this->security->get_csrf_token_name(),
-        'hash' => $this->security->get_csrf_hash()
+  'name' => $this->security->get_csrf_token_name(),
+  'hash' => $this->security->get_csrf_hash()
 );
 
 ?>
@@ -127,10 +127,10 @@ $csrf = array(
 
                 <div class="input-group col-md-12">
                   <label class="input-group-text" for="inputGroupSelect01">CARE</label>
-                    <select id="care" name="care" class="form-select" id="inputGroupSelect01">
-                      <option value="0" selected>OUTPATIENT</option>
-                      <option value="1">INPATIENT</option>
-                    </select>
+                  <select id="care" name="care" class="form-select" id="inputGroupSelect01">
+                    <option value="0" selected>OUTPATIENT</option>
+                    <option value="1">INPATIENT</option>
+                  </select>
                 </div>
 
               </div>
@@ -168,100 +168,216 @@ $csrf = array(
   //  });
 
   // Retrieve patient data on page load
-  const title = 'Reception section | List of Patient Visits'
-  var table_patients = $('#table_patients').DataTable({
-    oLanguage: {
-      sProcessing: "loading...",      
-      sLengthMenu: 'Show <select class="form-select">'+
-      '<option value="10">10</option>'+
-      '<option value="50">50</option>'+
-      '<option value="100">100</option>'+
-      '<option value="500">500</option>'+
-      '<option value="-1">All</option>'+
-      '</select> records'
-    },
-    responsive: true,
-    "processing":true,
-    "serverSide":true, 
-    "order":[],
-    "ajax": {
-      url : "<?php echo base_url('reception/my-patients');?>",
-      type : 'POST'
-    },
-    "ordering": false,
-    "dom": 'Blfrtip',
-    "buttons": [
-    {
-      extend: "copy",
-      title: title,
-    },
-    {
-      extend: "excel",
-      title: title,
-    },
-    {
-      extend: "csv",
-      title: title,
-    },
-    {
-      extend: "pdf",
-      title: title,
-      exportOptions: {
-        columns: [0, 1, 2, 3, 4, 5],
+    const title = 'Reception section | List of Patient Visits'
+    var table_patients = $('#table_patients').DataTable({
+      oLanguage: {
+        sProcessing: "loading...",      
+        sLengthMenu: 'Show <select class="form-select">'+
+        '<option value="10">10</option>'+
+        '<option value="50">50</option>'+
+        '<option value="100">100</option>'+
+        '<option value="500">500</option>'+
+        '<option value="-1">All</option>'+
+        '</select> records'
       },
-    },
-    {
-      extend: "print",
-      title: title,
-    },
-    ],
-  });
+      responsive: true,
+      "processing":true,
+      "serverSide":true, 
+      "order":[],
+      "ajax": {
+        url : "<?php echo base_url('reception/my-patients');?>",
+        type : 'POST'
+      },
+      "ordering": false,
+      "dom": 'Blfrtip',
+      "buttons": [
+      {
+        extend: "copy",
+        title: title,
+      },
+      {
+        extend: "excel",
+        title: title,
+      },
+      {
+        extend: "csv",
+        title: title,
+      },
+      {
+        extend: "pdf",
+        title: title,
+        exportOptions: {
+          columns: [0, 1, 2, 3, 4, 5],
+        },
+      },
+      {
+        extend: "print",
+        title: title,
+      },
+      ],
+    });
 
 
   // Open modal when incomplete button/row is clicked
-  $("#table_patients tbody").on('click', 'button', function() {
-   var id = $(this).attr('data-id');
-   var name = $(this).attr('data-patient');
-   var file_no = $(this).attr('data-file');
-   if(this.name == "statusButton") {
-    $('#patientInitialsModal').modal('show').on('shown.bs.modal', function () {                    
-      $("form#preliminaries input#record_id").val(id);
-      $("form#preliminaries input#patient_name").val(name);
-      $("form#preliminaries input#patient_file").val(file_no);
-      $('form#preliminaries input#patient_file').prop('readonly', true);
+    $("#table_patients tbody").on('click', 'button', function() {
+     var id = $(this).attr('data-id');
+     var name = $(this).attr('data-patient');
+     var file_no = $(this).attr('data-file');
+     const patient_id = $(this).attr('data-pid');
+     if(this.name == "statusButton") {
+
+      $("#preliminaries")[0].reset();
+      var latest_vitals = {};
+
+      $.ajax({
+        url: `<?php echo base_url('reception/client-latest-vitals/');?>/${patient_id}`,
+        type: "POST",
+        data: {},
+        dataType: "JSON",
+        cache: false,
+        timeout: 10000,
+        success: function (response) {
+          if(response.status){
+            latest_vitals = response.data;
+          // console.log(response.data.id);          
+          }
+          $('#patientInitialsModal').modal('show').on('shown.bs.modal', function (){
+            $("form#preliminaries input#record_id").val(id);
+            $("form#preliminaries input#patient_name").val(name);
+            $("form#preliminaries input#patient_file").val(file_no);
+            $('form#preliminaries input#patient_file').prop('readonly', true);
+
+            $("form#preliminaries input#blood_pressure").val(latest_vitals.bp);
+            $("form#preliminaries input#pulse_rate").val(latest_vitals.pr);
+            $("form#preliminaries input#weight").val(latest_vitals.weight);
+            $("form#preliminaries input#height").val(latest_vitals.height);
+            $("form#preliminaries input#temperature").val(latest_vitals.temp);
+            $("form#preliminaries input#respiration").val(latest_vitals.resp);
+          });
+        },
+        error: function (jqXHR, textStatus, errorThrown) {  
+          $('#patientInitialsModal').modal('show').on('shown.bs.modal', function (){
+            $("form#preliminaries input#record_id").val(id);
+            $("form#preliminaries input#patient_name").val(name);
+            $("form#preliminaries input#patient_file").val(file_no);
+            $('form#preliminaries input#patient_file').prop('readonly', true);
+
+            $("form#preliminaries input#blood_pressure").val(latest_vitals.bp);
+            $("form#preliminaries input#pulse_rate").val(latest_vitals.pr);
+            $("form#preliminaries input#weight").val(latest_vitals.weight);
+            $("form#preliminaries input#height").val(latest_vitals.height);
+            $("form#preliminaries input#temperature").val(latest_vitals.temp);
+            $("form#preliminaries input#respiration").val(latest_vitals.resp);
+          });
+        },
+      });
+
+    } else if(this.name == "deleteBtn"){
+
+      bootbox.confirm({
+        message: 'Are you sure?',
+        buttons: {
+          confirm: {
+            label: '<i class="fa fa-check"></i> Yes',
+            className: "btn-success",
+          },
+          cancel: {
+            label: '<i class="fa fa-times"></i> No',
+            className: "btn-danger",
+          },
+        },
+        callback: function (result) {
+          if (result == true) {
+
+           var dialog = bootbox
+           .dialog({
+            message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Please wait...</div>',
+            closeButton: false,
+          }).on("shown.bs.modal", function () {
+            $.ajax({
+              url: '<?php echo base_url('reception/delete-patient/');?>'+id,
+              type: "POST",
+              data: {},
+              dataType: "JSON",
+              success: function (response) {
+                bootbox.alert(response.data.toString(), function () {
+                  table_patients.ajax.reload();
+                  dialog.modal("hide");
+                });
+              },
+              error: function (jqXHR, textStatus, errorThrown) {
+                bootbox.alert(errorThrown.toString(), function () {
+                  table_patients.ajax.reload();
+                  dialog.modal("hide");
+                });
+              },
+            });
+          });
+
+        }
+      }
     });
-  } else if(this.name == "deleteBtn"){
 
-    bootbox.confirm({
-      message: 'Are you sure?',
-      buttons: {
-        confirm: {
-          label: '<i class="fa fa-check"></i> Yes',
-          className: "btn-success",
-        },
-        cancel: {
-          label: '<i class="fa fa-times"></i> No',
-          className: "btn-danger",
-        },
+    } else {}
+  });
+
+
+// Submit preliminaries
+    $("#preliminaries").validate({
+      errorPlacement: function(error, element) {
+        error.addClass('text-danger');
+        error.insertAfter(element.parent('div'));
+    // error.insertAfter(element.next('span'));
       },
-      callback: function (result) {
-        if (result == true) {
-
-         var dialog = bootbox
-         .dialog({
-          message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Please wait...</div>',
+      debug: false,
+      errorClass: "is-invalid",
+      validClass: "is-valid",
+      errorElement: "div",
+      rules: { 
+        record_id: { required: true },
+        patient_file: { required: true },
+        blood_pressure: { required: true },
+        pulse_rate: { required: true, range: [40, 171] },
+        weight: { required: true, range: [1.5, 727] },
+        height: { required: true, range: [22, 500] },
+        temperature: { required: true, range: [28, 41] },
+        respiration: { required: true, range: [9, 61] },
+        care: { required: true, number: true, range: [0, 1] },
+      },
+      highlight: function( element, errorClass, validClass ) {
+        $(element).addClass(errorClass).removeClass(validClass);
+      },
+      unhighlight: function( element, errorClass, validClass ) {
+        $(element).removeClass(errorClass).addClass(validClass);
+      },
+      submitHandler: function () {
+        var dialog = bootbox
+        .dialog({
+          message:
+          '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Please wait...</div>',
           closeButton: false,
-        }).on("shown.bs.modal", function () {
+        })
+        .on("shown.bs.modal", function () {
+          var formdata = $("#preliminaries").serialize();
           $.ajax({
-            url: '<?php echo base_url('reception/delete-patient/');?>'+id,
+            url: '<?php echo base_url('reception/patient-preliminaries');?>',
             type: "POST",
-            data: {},
+            data: formdata,
             dataType: "JSON",
             success: function (response) {
-              bootbox.alert(response.data.toString(), function () {
-                table_patients.ajax.reload();
-                dialog.modal("hide");
-              });
+              table_patients.ajax.reload();
+              if (response.status) {
+                $("#preliminaries")[0].reset();
+                $('#patientInitialsModal').modal('hide');
+                bootbox.alert(response.data.toString(), function () {
+                  dialog.modal("hide");
+                });
+              } else {
+                bootbox.alert(response.data.toString(), function () {
+                  table_patients.ajax.reload();
+                  dialog.modal("hide");
+                });
+              }
             },
             error: function (jqXHR, textStatus, errorThrown) {
               bootbox.alert(errorThrown.toString(), function () {
@@ -269,84 +385,10 @@ $csrf = array(
                 dialog.modal("hide");
               });
             },
-          });
+          });      
         });
-
-      }
-    }
-  });
-
-  } else {}
-});
-
-
-// Submit preliminaries
-$("#preliminaries").validate({
-  errorPlacement: function(error, element) {
-    error.addClass('text-danger');
-    error.insertAfter(element.parent('div'));
-    // error.insertAfter(element.next('span'));
-  },
-  debug: false,
-  errorClass: "is-invalid",
-  validClass: "is-valid",
-  errorElement: "div",
-  rules: { 
-    record_id: { required: true },
-    patient_file: { required: true },
-    blood_pressure: { required: true },
-    pulse_rate: { required: true, range: [40, 171] },
-    weight: { required: true, range: [1.5, 727] },
-    height: { required: true, range: [22, 500] },
-    temperature: { required: true, range: [28, 41] },
-    respiration: { required: true, range: [9, 61] },
-    care: { required: true, number: true, range: [0, 1] },
-  },
-  highlight: function( element, errorClass, validClass ) {
-    $(element).addClass(errorClass).removeClass(validClass);
-  },
-  unhighlight: function( element, errorClass, validClass ) {
-    $(element).removeClass(errorClass).addClass(validClass);
-  },
-  submitHandler: function () {
-    var dialog = bootbox
-    .dialog({
-      message:
-      '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Please wait...</div>',
-      closeButton: false,
-    })
-    .on("shown.bs.modal", function () {
-      var formdata = $("#preliminaries").serialize();
-      $.ajax({
-        url: '<?php echo base_url('reception/patient-preliminaries');?>',
-        type: "POST",
-        data: formdata,
-        dataType: "JSON",
-        success: function (response) {
-          table_patients.ajax.reload();
-          if (response.status) {
-            $("#preliminaries")[0].reset();
-            $('#patientInitialsModal').modal('hide');
-            bootbox.alert(response.data.toString(), function () {
-              dialog.modal("hide");
-            });
-          } else {
-            bootbox.alert(response.data.toString(), function () {
-              table_patients.ajax.reload();
-              dialog.modal("hide");
-            });
-          }
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-          bootbox.alert(errorThrown.toString(), function () {
-            table_patients.ajax.reload();
-            dialog.modal("hide");
-          });
-        },
-      });      
+      },
     });
-  },
-});
 
-});
+  });
 </script>

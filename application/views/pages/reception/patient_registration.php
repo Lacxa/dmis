@@ -148,6 +148,7 @@ $csrf = array(
 <script>
   $(function () {
     $('.datepicker').datepicker({
+      todayHighlight: true,
       clearBtn: true,
       autoclose: true,
       changeMonth: true,

@@ -195,7 +195,7 @@ class Reception extends CI_Controller {
                 
                 $deleteBtn = '<button type="button" class="btn btn-danger btn-sm" name="deleteBtn" data-id="'.$r->rec_id.'" data-patient="'.$full_name.'" data-file="'.$r->rec_patient_file.'" title="Remove"><i class="bi bi-trash3-fill"></i></button>';
                 
-                $pendingBtn = '<button type="button" class="btn btn-sm btn-warning" name="statusButton" data-id="'.$r->rec_id.'" data-patient="'.$full_name.'" data-file="'.$r->rec_patient_file.'" title="Finalize this entry"><i class="bi bi-exclamation-octagon"></i> Pending</button>';
+                $pendingBtn = '<button type="button" class="btn btn-sm btn-warning" name="statusButton" data-id="'.$r->rec_id.'" data-patient="'.$full_name.'" data-file="'.$r->rec_patient_file.'" data-pid="'.$r->rec_patient_id.'" title="Finalize this entry"><i class="bi bi-exclamation-octagon"></i> Pending</button>';
                 
                 $data[] = array(
                     $i,
@@ -333,13 +333,14 @@ class Reception extends CI_Controller {
                     }
                     else
                     {
-                        if($this->patient_model->checkPhoneExist($pat_phone))
-                        {
-                            echo json_encode(array("status" => FALSE , 'data' => '<code> Phone number arleady exists! </code>'));
-                            exit();
-                        }
-                        else
-                        {                            
+                        // if($this->patient_model->checkPhoneExist($pat_phone))
+                        // {
+                        //     echo json_encode(array("status" => FALSE , 'data' => '<code> Phone number arleady exists! </code>'));
+                        //     exit();
+                        // }
+                        // else
+                        // { 
+                            
                             $file_no = $this->generate_file_number();
                             while($this->checkIfFileNumberExist($file_no))
                             {
@@ -386,7 +387,9 @@ class Reception extends CI_Controller {
                             
                             echo json_encode(array("status" => TRUE , 'data' => '<code> Registered successifully </code>'));
                             exit();
-                        }
+
+                        // }
+
                     }
                 }
             } catch (\Throwable $th) {
@@ -451,6 +454,32 @@ class Reception extends CI_Controller {
                 exit();
             }
         }
+    }
+
+    public function client_latest_vitals($patient)
+    {
+        $patient_id = $this->security->xss_clean($patient);
+        $patient_data = $this->patient_model->get_patient_by_id($patient_id);
+            
+            if(!empty($patient_data))
+            {
+                $latest_vitals = $this->patient_model->get_latest_vitals($patient_id);
+                if(!empty($latest_vitals))
+                {
+                    echo json_encode(array("status" => TRUE , 'data' => $latest_vitals));
+                    exit();
+                }
+                else
+                {
+                    echo json_encode(array("status" => FALSE , 'data' => '<code> Oops!, no latest vitals found </code>'.$patient_id));
+                    exit();
+                }               
+            }
+            else
+            {
+                echo json_encode(array("status" => FALSE , 'data' => '<code> Oops!, no such entry </code>'));
+                exit();
+            }
     }
     
     public function patient_preliminaries()
