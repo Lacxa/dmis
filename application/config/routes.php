@@ -198,6 +198,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     $route['reports/general-report/(:any)'] = "e_reports/general_report/$1";
     $route['reports/age-gender'] = "e_reports/age_gender";
     $route['reports/disease-distribution'] = "e_reports/disease_distribution";
+    $route['reports/lab-and-non-lab'] = "e_reports/lab_and_non_lab";
     
     // Pharmacy routes
     $route['pharmacy'] = 'pharmacy';

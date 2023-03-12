@@ -3112,6 +3112,10 @@ public function disease_distribution_report($start, $end)
     {
         $this->db->select('COUNT(CASE WHEN p.pat_occupation = "STUDENT" THEN s.sy_id END) AS students, COUNT(CASE WHEN p.pat_occupation = "EMPLOYEE" THEN s.sy_id END) AS employees, COUNT(CASE WHEN p.pat_occupation = "OTHER" THEN s.sy_id END) AS others, COUNT(*) AS total');
         $this->db->join('patient p', 'p.pat_file_no = s.sy_record_patient_pf', 'left');
+        $this->db->join('patient_visit v', 'v.vs_record_id = s.sy_record_id', 'left');
+        $this->db->where('DATE(s.sy_time) >=', $start);
+        $this->db->where('DATE(s.sy_time) <=', $end);
+        $this->db->where('v.vs_visit', 'nimetoka_ph');
         $this->db->like('s.sy_diseases', $row['code']);
         $sub_query = $this->db->get('patient_symptoms s')->result_array();
         if($sub_query[0]['students'] > 0 || $sub_query[0]['employees'] > 0 || $sub_query[0]['others'] > 0)
@@ -3123,6 +3127,21 @@ public function disease_distribution_report($start, $end)
     return $data;
 }
 
+public function lab_and_non_lab_report($start, $end, $lab=TRUE)
+{
+    $this->db->select('COUNT(CASE WHEN p.pat_occupation = "STUDENT" THEN s.sy_id END) AS students, COUNT(CASE WHEN p.pat_occupation = "EMPLOYEE" THEN s.sy_id END) AS employees, COUNT(CASE WHEN p.pat_occupation = "OTHER" THEN s.sy_id END) AS others, COUNT(*) AS total');
+    $this->db->join('patient p', 'p.pat_file_no = s.sy_record_patient_pf', 'left');
+    $this->db->join('patient_visit v', 'v.vs_record_id = s.sy_record_id', 'left');
+    $this->db->where('DATE(s.sy_time) >=', $start);
+    $this->db->where('DATE(s.sy_time) <=', $end);
+    $this->db->where('v.vs_visit', 'nimetoka_ph');
+    if($lab)
+    {
+        $this->db->where('s.sy_lab', 1);
+    }
+    $data = $this->db->get('patient_symptoms s')->result_array();             
+    return $data;
+}
 
 }
 ?>

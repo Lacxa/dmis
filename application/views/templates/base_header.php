@@ -50,7 +50,8 @@ $csrf = array(
   <link href="<?php echo base_url('assets/css/style.css'); ?>" rel="stylesheet">
 
   <!-- DataTable CSS Files -->
-  <link href="<?php echo base_url('assets/css/dataTables.bootstrap4.css'); ?>" rel="stylesheet">
+  <!-- <link href="<f?php echo base_url('assets/css/dataTables.bootstrap4.css'); ?>" rel="stylesheet"> -->
+  <link href="<?php echo base_url('assets/css/dataTables.bootstrap5.min.css'); ?>" rel="stylesheet">
   <link href="<?php echo base_url('assets/css/buttons.dataTables.min.css'); ?>" rel="stylesheet">
   <link href="<?php echo base_url('assets/css/responsive.bootstrap.min.css'); ?>" rel="stylesheet"> 
 </head>

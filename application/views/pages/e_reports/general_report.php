@@ -22,7 +22,7 @@ $csrf = array(
           </h5>
           <div class="row g-3">
             <div class="col-12">
-              <select id="inputState" class="form-select" required>
+              <select id="inputState" class="form-select">
                 <option value="" selected>Choose...</option>
                 <option value="1">PATIENTS: AGE/GENDER DISTRIBUTION REPORT</option>
                 <option value="2">PATIENTS: DISEASE DISTRIBUTION REPORT</option>
@@ -69,9 +69,9 @@ $csrf = array(
               </form>
 
               <div class="row mt-4 g-3 mx-2 table-responsive" id="age_gen_res" style="display:none;">
-                <table id="age_gen_tb" class="table table-striped table-bordered table-sm caption-top cell-border" style="width:100%;">
+                <table id="age_gen_tb" class="table table-bordered table-sm caption-top cell-border" style="width:100%;">
                   <caption id="age_gen_caption"></caption>
-                  <thead>
+                  <thead class="table-light">
                     <tr>
                       <th rowspan="2"></th>
                       <th colspan="3" class="text-center">0 - 1 YEAR</th>
@@ -95,7 +95,7 @@ $csrf = array(
                     </tr>
                   </thead>
                   <tbody></tbody>
-                  <tfoot>
+                  <tfoot class="table-light">
                     <tr>
                       <th>Total</th><th></th>
                     </tr>
@@ -104,9 +104,9 @@ $csrf = array(
               </div>
 
               <div class="row mt-4 g-3 mx-2 table-responsive" id="disease_res" style="display: none;">
-                <table id="disease_tb" class="table table-striped table-bordered table-sm caption-top" style="width:100%;">
+                <table id="disease_tb" class="table table-bordered table-hover table-sm caption-top" style="width:100%;">
                   <caption id="disease_caption"></caption>
-                  <thead>
+                  <thead class="table-light">
                     <tr>
                       <th rowspan="2" class="text-center">#</th>
                       <th rowspan="2" class="text-center">Disease</th>
@@ -121,9 +121,37 @@ $csrf = array(
                     </tr>
                   </thead>
                   <tbody></tbody>
-                  <tfoot>
+                  <tfoot class="table-light">
                     <tr>
                       <th class="text-end" colspan="3">Total</th>
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+
+              <div class="row mt-4 g-3 mx-2 table-responsive" id="lab_res" style="display: none;">
+                <table id="lab_tb" class="table table-bordered table-sm caption-top" style="width:100%;">
+                  <caption id="lab_caption"></caption>
+                  <thead class="table-light">
+                    <tr>
+                      <th rowspan="2" class="text-center">#</th>
+                      <th colspan="4" class="text-center">Patients</th>
+                    </tr>
+                    <tr>
+                      <th>Students</th>
+                      <th>Employees</th>
+                      <th>Others</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                  <tfoot class="table-light">
+                    <tr>
+                      <th class="text-end">Total</th>
                       <th></th>
                       <th></th>
                       <th></th>
@@ -165,6 +193,7 @@ $csrf = array(
 
     var age_gen_dt = $('#age_gen_tb').DataTable({
       "dom": 'Brtip',
+      "ordering": false,
       "buttons": [
         { extend: "copy", footer: true },
         { extend: "excel", footer: true },
@@ -267,11 +296,58 @@ $csrf = array(
       },
     });
 
+    var lab_dt = $('#lab_tb').DataTable({
+      "dom": 'Brtip',
+      "ordering": false,
+      "buttons": [
+        { extend: "copy", footer: true },
+        { extend: "excel", footer: true },
+        { extend: "csv", footer: true },
+        { extend: "pdf", footer: true },
+        { extend: "print", footer: true },
+        ],
+      "fnDrawCallback": function(oSettings) {
+        if ($('#lab_tb tr').length < 11) {
+          $('.dataTables_paginate').hide();
+        }
+      },
+      "footerCallback": function (row, data, start, end, display) {
+        var api = this.api(), data;
+
+        // converting to interger to find total
+        var intVal = function (i) {
+          return typeof i === 'string' ?
+          i.replace(/[\$,]/g, '')*1 :
+          typeof i === 'number' ?
+          i : 0;          
+        }; 
+
+        var group1 = api.column(1).data().reduce(function(a, b) {
+          return intVal(a) + intVal(b);
+        }, 0);
+        var group2 = api.column(2).data().reduce(function(a, b) {
+          return intVal(a) + intVal(b);
+        }, 0);
+        var group3 = api.column(3).data().reduce(function(a, b) {
+          return intVal(a) + intVal(b);
+        }, 0);
+        var group4 = api.column(4).data().reduce(function(a, b) {
+          return intVal(a) + intVal(b);
+        }, 0);
+
+        $(api.column(1).footer()).html(group1);
+        $(api.column(2).footer()).html(group2);
+        $(api.column(3).footer()).html(group3);
+        $(api.column(4).footer()).html(group4);
+      },
+    });
+
     $('select').on('change', function() {
       const value = this.value;
       if(value) {
         $('div#age_gen_res').hide();
         $('div#disease_res').hide();
+        $('div#lab_res').hide();
         $("form#general_form")[0].reset();
         $("form#general_form input#report_type").val(value);
       }
@@ -300,18 +376,15 @@ $csrf = array(
       unhighlight: function( element, errorClass, validClass ) {
         $(element).removeClass(errorClass).addClass(validClass);
       },
-      submitHandler: function () {
-        var dialog = bootbox
-        .dialog({
-          message:
-          '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Fetching results...</div>',
-          closeButton: false,
-        })
-        .on("shown.bs.modal", function () {
+      submitHandler: function (){
+        if($("#inputState").val() != ""){
+          var dialog = bootbox.dialog({message:'<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Fetching results...</div>',closeButton: false,
+        }).on("shown.bs.modal", function () {
           const form_val = parseInt($("form#general_form input#report_type").val());
           let url = '';
           if(form_val == 1) url = '<?php echo base_url('reports/age-gender');?>';
           else if(form_val == 2) url = '<?php echo base_url('reports/disease-distribution');?>';
+          else if(form_val == 3) url = '<?php echo base_url('reports/lab-and-non-lab');?>';
 
           var formdata = $("form#general_form").serialize();
           $.ajax({
@@ -323,6 +396,7 @@ $csrf = array(
               if (response.status) {
                 if(form_val == 1) setAgeGenderDistribution(response);
                 else if(form_val == 2) setDiseaseDistribution(response);
+                else if(form_val == 3) setLabAndNonLab(response);
                 dialog.modal("hide");
               } else {
                 bootbox.alert(response.data.toString(), function () {
@@ -337,8 +411,9 @@ $csrf = array(
             },
           });
         });
-      },
-    });
+      }
+    },
+  });
 
     function setAgeGenderDistribution(response) {
       const group_1 = response.data.group_1[0];
@@ -356,21 +431,27 @@ $csrf = array(
 
     function setDiseaseDistribution(response) {      
       const data = response.data;
-      // console.log(data);
-      let students_total = 0;
-      let employees_total = 0;
-      let others_total = 0;
-      let total = 0;
+      disease_dt.clear().draw();
       $("#disease_tb #disease_caption").html(`<em>Patients: disease distribution dated from <code>${$("form#general_form input#start").val()}</code> to <code> ${$("form#general_form input#end").val()} </code></em>`);
-      disease_dt.clear();
-      $.each(data, function(key, value){
-        students_total += parseInt(value.patients[0].students);
-        employees_total += parseInt(value.patients[0].employees);
-        others_total += parseInt(value.patients[0].others);
-        total += parseInt(value.patients[0].total);
-        disease_dt.row.add([key+1, value.name, value.code, value.patients[0].students, value.patients[0].employees, value.patients[0].others, value.patients[0].total]).draw(false);
-      });
+      if(data.length > 0) {
+        $.each(data, function(key, value){
+          disease_dt.row.add([key+1, value.name, value.code, value.patients[0].students, value.patients[0].employees, value.patients[0].others, value.patients[0].total]).draw(false);
+        });
+      }
       $('div#disease_res').show();
+    }
+
+    function setLabAndNonLab(response){
+      const data = response.data;
+      lab_dt.clear().draw();
+      $("#lab_tb #lab_caption").html(`<em>Patients: lab/non-lab distribution dated from <code>${$("form#general_form input#start").val()}</code> to <code> ${$("form#general_form input#end").val()} </code></em>`);
+      const lab = data.lab[0];
+      const nonLab = data.nonLab[0];
+      lab_dt.rows.add([
+        ['Lab', lab.students, lab.employees, lab.others, lab.total],
+        ['Non-Lab', nonLab.students, nonLab.employees, nonLab.others, nonLab.total]
+        ]).draw(false);
+      $('div#lab_res').show();
     }
 
   });

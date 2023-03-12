@@ -29,8 +29,10 @@
   <script src="<?php echo base_url('assets/vendor/php-email-form/validate.js'); ?>"></script>
 
   <!-- Data table entry -->
-  <script src="<?php echo base_url('assets/js/datatable/dataTables.min.js');?>"></script>
-  <script src="<?php echo base_url('assets/js/datatable/dataTables.bootstrap4.min.js') ;?>"></script>
+  <!-- <script src="<f?php echo base_url('assets/js/datatable/dataTables.min.js');?>"></script> -->
+  <script src="<?php echo base_url('assets/js/datatable/jquery.dataTables.min.js');?>"></script>
+  <!-- <script src="<f?php echo base_url('assets/js/datatable/dataTables.bootstrap4.min.js') ;?>"></script> -->
+  <script src="<?php echo base_url('assets/js/datatable/dataTables.bootstrap5.min.js') ;?>"></script>
   <script src="<?php echo base_url('assets/js/datatable/dataTables.buttons.min.js');?>"></script>
   <script src="<?php echo base_url('assets/js/datatable/jszip.min.js');?>"></script>
   <script src="<?php echo base_url('assets/js/datatable/pdfmake.min.js');?>"></script>

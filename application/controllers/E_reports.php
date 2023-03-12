@@ -1100,7 +1100,7 @@ class E_reports extends CI_Controller {
 				$html .= "<td>".$db_table->size." (compressed)</td>";
 				$html .= "<td>".$db_table->day."</td>";
 				$html .= "<td>".$db_table->author."</td>";
-				$html .= '<td><a type="button" href="' . base_url('reports/download-db-backup') . '" class="btn btn-primary" name="download"><i class="bi bi-save me-1"></i> Download</a>&nbsp;<a type="button" href="#" class="btn btn-primary" name="backup"><i class="bi bi-cloud-arrow-down me-1"></i> Backup</a></td>';
+				$html .= '<td><a type="button" href="' . base_url('reports/download-db-backup') . '" class="btn btn-outline-secondary btn-sm" name="download"><i class="bi bi-save me-1"></i> Download</a>&nbsp;<a type="button" href="#" class="btn btn-primary btn-sm" name="backup"><i class="bi bi-cloud-arrow-down me-1"></i> Backup</a></td>';
 				$html .= "</tr>";
 				
 				echo json_encode($html);
@@ -1198,8 +1198,8 @@ class E_reports extends CI_Controller {
 		
 		if ($this->form_validation->run() == FALSE)
 		{
-			$this->session->set_flashdata('error', validation_errors());
-			return redirect($_SERVER['HTTP_REFERER']);
+			echo json_encode(array("status" => FALSE, 'data' => validation_errors()));
+            exit();
 		}
 		else
 		{
@@ -1234,31 +1234,43 @@ class E_reports extends CI_Controller {
 		
 		if ($this->form_validation->run() == FALSE)
 		{
-			$this->session->set_flashdata('error', validation_errors());
-			return redirect($_SERVER['HTTP_REFERER']);
+			echo json_encode(array("status" => FALSE, 'data' => validation_errors()));
+            exit();
 		}
 		else
 		{
 			$start = date('Y-m-d', strtotime($this->security->xss_clean($this->input->post('start'))));
 			$end = date('Y-m-d', strtotime($this->security->xss_clean($this->input->post('end'))));
 
-			// $group_1 = [0, 1];
-			// $group_2 = [1, 5];
-			// $group_3 = [5, 60];
-			// $group_4 = [60, 0];
-
-			$res_group_1 = $this->patient_model->disease_distribution_report($start, $end);
-			// $res_group_2 = $this->patient_model->disease_distribution_report($start, $end, $group_2);
-			// $res_group_3 = $this->patient_model->disease_distribution_report($start, $end, $group_3);
-			// $res_group_4 = $this->patient_model->disease_distribution_report($start, $end, $group_4);
-
-			// $result = array(
-			// 	'group_1' => $res_group_1,
-			// 	'group_2' => $res_group_2,
-			// 	'group_3' => $res_group_3,
-			// 	'group_4' => $res_group_4,
-			// );			
+			$res_group_1 = $this->patient_model->disease_distribution_report($start, $end);			
 			echo json_encode(array("status" => TRUE, 'data' => $res_group_1));
+			exit();
+		}
+	}
+	
+	public function lab_and_non_lab()
+	{
+		$this->form_validation->set_rules('start', 'Start Date', 'trim|required');
+		$this->form_validation->set_rules('end', 'End Date', 'trim|required');
+		
+		if ($this->form_validation->run() == FALSE)
+		{
+			echo json_encode(array("status" => FALSE, 'data' => validation_errors()));
+            exit();
+		}
+		else
+		{
+			$start = date('Y-m-d', strtotime($this->security->xss_clean($this->input->post('start'))));
+			$end = date('Y-m-d', strtotime($this->security->xss_clean($this->input->post('end'))));
+
+			$res_1 = $this->patient_model->lab_and_non_lab_report($start, $end);			
+			$res_2 = $this->patient_model->lab_and_non_lab_report($start, $end, FALSE);
+
+			$results = array(
+				'lab' => $res_1,
+				'nonLab' => $res_2,
+			);	
+			echo json_encode(array("status" => TRUE, 'data' => $results));
 			exit();
 		}
 	}
