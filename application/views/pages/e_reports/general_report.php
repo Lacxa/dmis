@@ -233,16 +233,18 @@ $csrf = array(
 
     var disease_dt = $('#disease_tb').DataTable({
       "dom": 'Blfrtip',
-      "oLanguage": {
-        sProcessing: "loading...",      
-        sLengthMenu: 'Show <select class="form-select">'+
-        '<option value="10">10</option>'+
-        '<option value="50">50</option>'+
-        '<option value="100">100</option>'+
-        '<option value="500">500</option>'+
-        '<option value="-1">All</option>'+
-        '</select> records'
-      },
+      "lengthMenu": [ [10, 25, 50, -1], [10, 25, 50, "All"] ],
+      "pageLength": 10,
+      // "oLanguage": {
+      //   sProcessing: "loading...",      
+      //   sLengthMenu: 'Show <select class="form-select">'+
+      //   '<option value="10">10</option>'+
+      //   '<option value="50">50</option>'+
+      //   '<option value="100">100</option>'+
+      //   '<option value="500">500</option>'+
+      //   '<option value="-1">All</option>'+
+      //   '</select> records'
+      // },
       "buttons": [
         { extend: "copy", footer: true },
         { extend: "excel", footer: true },
@@ -250,6 +252,11 @@ $csrf = array(
         { extend: "pdf", footer: true },
         { extend: "print", footer: true },
         ],
+        "fnDrawCallback": function(oSettings) {
+          if ($('#disease_tb tr').length < 11) {
+            $('#disease_tb .dataTables_paginate').hide();
+          }
+        },
       "footerCallback": function (row, data, start, end, display) {
         var api = this.api(), data;
 
@@ -308,7 +315,7 @@ $csrf = array(
         ],
       "fnDrawCallback": function(oSettings) {
         if ($('#lab_tb tr').length < 11) {
-          $('.dataTables_paginate').hide();
+          $('#lab_tb .dataTables_paginate').hide();
         }
       },
       "footerCallback": function (row, data, start, end, display) {
