@@ -3123,7 +3123,7 @@ public function disease_distribution_report($start, $end)
             $row['patients'] = $sub_query;
             $data[] = $row;
         }
-    }     
+    }  
     return $data;
 }
 
@@ -3140,6 +3140,53 @@ public function lab_and_non_lab_report($start, $end, $lab=TRUE)
         $this->db->where('s.sy_lab', 1);
     }
     $data = $this->db->get('patient_symptoms s')->result_array();             
+    return $data;
+}
+
+
+public function diagnosis_report($start, $end)
+{
+    $this->db->select('CASE WHEN icat_alias is NULL THEN icat_name WHEN icat_alias="" THEN icat_name ELSE CONCAT(icat_name, " (", icat_alias, ")") END AS name, icat_token as token');
+    $query = $this->db->get('investigation_category')->result_array();
+    $data = [];
+    foreach ($query as $key => $row)
+    {
+        $sub_data = $this->sub_diagnosis_report($row['token'], $start, $end);
+        if(!empty($sub_data))
+        {
+            $row['sub'] = $sub_data;
+            $data[] = $row;
+        }
+    }     
+    return $data;
+}
+
+private function sub_diagnosis_report($category, $start, $end)
+{
+    $this->db->select('CASE WHEN isub_alias is NULL THEN isub_name WHEN isub_alias="" THEN isub_name ELSE CONCAT(isub_name, " (", isub_alias, ")") END AS name, isub_token as sub_token');
+    $this->db->where('isub_category', $category);
+    $query = $this->db->get('investigation_subcategory')->result_array();
+    $data = [];
+
+    foreach ($query as $key => $row)
+    {
+        $this->db->select('COUNT(CASE WHEN p.pat_occupation = "STUDENT" THEN s.sy_id END) AS students, COUNT(CASE WHEN p.pat_occupation = "EMPLOYEE" THEN s.sy_id END) AS employees, COUNT(CASE WHEN p.pat_occupation = "OTHER" THEN s.sy_id END) AS others, COUNT(*) AS total');
+        $this->db->join('patient p', 'p.pat_file_no = s.sy_record_patient_pf', 'left');
+        $this->db->join('patient_visit v', 'v.vs_record_id = s.sy_record_id', 'left');
+        $this->db->where('DATE(s.sy_time) >=', $start);
+        $this->db->where('DATE(s.sy_time) <=', $end);
+        $this->db->where('v.vs_visit', 'nimetoka_ph');
+        $this->db->like('s.sy_investigations', $row['sub_token'].'~@');
+        $sub_query = $this->db->get('patient_symptoms s')->result_array();
+        if($sub_query[0]['students'] > 0 || $sub_query[0]['employees'] > 0 || $sub_query[0]['others'] > 0)
+        {
+            $row['students'] = $sub_query[0]['students'];
+            $row['employees'] = $sub_query[0]['employees'];
+            $row['others'] = $sub_query[0]['others'];
+            $row['total'] = $sub_query[0]['total'];
+            $data[] = $row;
+        }
+    }
     return $data;
 }
 

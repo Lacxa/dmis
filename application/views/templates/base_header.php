@@ -490,7 +490,7 @@ $csrf = array(
                     <ul id="pro-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
                       <li>
                         <a href="<?php echo base_url('reports/monitor/'.@$header); ?>">
-                          <i class="bi bi-box-arrow-right"></i><span>Patients Monitor</span>
+                          <i class="bi bi-circle"></i><span>Patients Monitor</span>
                         </a>
                       </li>
                       <li>

@@ -27,6 +27,7 @@ date_default_timezone_set('Africa/Dar_es_Salaam');
 */
 $config['base_url'] = 'http://kali.jovin/';
 // $config['base_url'] = 'http://192.168.2.9/';
+// $config['base_url'] = 'https://www.dmis.jayhome.site/';
 
 /*
 |--------------------------------------------------------------------------

@@ -1275,4 +1275,25 @@ class E_reports extends CI_Controller {
 		}
 	}
 	
+	public function diagnosis_report()
+	{
+		$this->form_validation->set_rules('start', 'Start Date', 'trim|required');
+		$this->form_validation->set_rules('end', 'End Date', 'trim|required');
+		
+		if ($this->form_validation->run() == FALSE)
+		{
+			echo json_encode(array("status" => FALSE, 'data' => validation_errors()));
+            exit();
+		}
+		else
+		{
+			$start = date('Y-m-d', strtotime($this->security->xss_clean($this->input->post('start'))));
+			$end = date('Y-m-d', strtotime($this->security->xss_clean($this->input->post('end'))));
+
+			$result = $this->patient_model->diagnosis_report($start, $end);			
+			echo json_encode(array("status" => TRUE, 'data' => $result));
+			exit();
+		}
+	}
+	
 }

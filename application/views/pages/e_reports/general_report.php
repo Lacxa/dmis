@@ -27,6 +27,7 @@ $csrf = array(
                 <option value="1">PATIENTS: AGE/GENDER DISTRIBUTION REPORT</option>
                 <option value="2">PATIENTS: DISEASE DISTRIBUTION REPORT</option>
                 <option value="3">PATIENTS: LAB/NON-LAB REPORT</option>
+                <option value="4">PATIENTS: DIAGNOSIS REPORT</option>
               </select>
             </div>
           </div>
@@ -158,6 +159,19 @@ $csrf = array(
                       <th></th>
                     </tr>
                   </tfoot>
+                </table>
+              </div>
+
+              <div class="row mt-4 g-3 mx-2 table-responsive" id="diagnosis_res" style="display: none;">
+                <table id="diagnosis_tb" class="table table-hover table-sm caption-top" style="width:100%;">
+                  <caption id="diagnosis_caption"></caption>
+                  <thead class="table-light">
+                    <tr>
+                      <th class="text-center">Category</th>
+                      <th class="text-center">Diagnosis</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
                 </table>
               </div>
 
@@ -349,12 +363,40 @@ $csrf = array(
       },
     });
 
+    const columns = [
+      { title: 'Diagnosis' },
+      { title: 'Students' },
+      { title: 'Employees' },
+      { title: 'Others' },
+      { title: 'Total' },
+      ]
+
+    var diagnosis_dt = $('#diagnosis_tb').DataTable({
+      "dom": 'Blfrtip',
+      "lengthMenu": [ [10, 25, 50, -1], [10, 25, 50, "All"] ],
+      "pageLength": 10,
+      "buttons": [
+        { extend: "copy", footer: true },
+        { extend: "excel", footer: true },
+        { extend: "csv", footer: true },
+        { extend: "pdf", footer: true },
+        { extend: "print", footer: true },
+        ],
+      createdRow: function(row) {
+        $(row).find('td table').DataTable({
+          columns: columns,
+          dom: 'tp',
+        })
+      },
+    });
+
     $('select').on('change', function() {
       const value = this.value;
       if(value) {
         $('div#age_gen_res').hide();
         $('div#disease_res').hide();
         $('div#lab_res').hide();
+        $('div#diagnosis_res').hide();
         $("form#general_form")[0].reset();
         $("form#general_form input#report_type").val(value);
       }
@@ -392,6 +434,7 @@ $csrf = array(
           if(form_val == 1) url = '<?php echo base_url('reports/age-gender');?>';
           else if(form_val == 2) url = '<?php echo base_url('reports/disease-distribution');?>';
           else if(form_val == 3) url = '<?php echo base_url('reports/lab-and-non-lab');?>';
+          else if(form_val == 4) url = '<?php echo base_url('reports/diagnosis');?>';
 
           var formdata = $("form#general_form").serialize();
           $.ajax({
@@ -404,6 +447,7 @@ $csrf = array(
                 if(form_val == 1) setAgeGenderDistribution(response);
                 else if(form_val == 2) setDiseaseDistribution(response);
                 else if(form_val == 3) setLabAndNonLab(response);
+                else if(form_val == 4) setDiagosisReport(response);
                 dialog.modal("hide");
               } else {
                 bootbox.alert(response.data.toString(), function () {
@@ -413,6 +457,7 @@ $csrf = array(
             },
             error: function (jqXHR, textStatus, errorThrown) {
               bootbox.alert(errorThrown.toString(), function () {
+                // console.log(jqXHR);
                 dialog.modal("hide");
               });
             },
@@ -459,6 +504,43 @@ $csrf = array(
         ['Non-Lab', nonLab.students, nonLab.employees, nonLab.others, nonLab.total]
         ]).draw(false);
       $('div#lab_res').show();
+    }
+
+    function setDiagosisReport(response){
+      const data = response.data;
+      diagnosis_dt.clear().draw();    
+      $("#diagnosis_tb #diagnosis_caption").html(`<em>Patients: diagnosis report dated from <code>${$("form#general_form input#start").val()}</code> to <code> ${$("form#general_form input#end").val()} </code></em>`);
+      if(data.length > 0) {
+        $.each(data, function(key, value){
+
+          let subrows = '';
+          $.each(value.sub, function(k, val){
+            subrows += `<tr>
+            <td>${val.name}</td>
+            <td>${val.students}</td>
+            <td>${val.employees}</td>
+            <td>${val.others}</td>
+            <td>${val.total}</td></tr>`;
+          });
+
+          diagnosis_dt.row.add([value.name, `<div id="${value.token}"><table id="${value.token}" class="table table-bordered table-sm subTable" style="width:100%;">
+            <thead>
+              <tr>
+                <th rowspan="2" class="text-center">Diagnosis</th>
+                <th colspan="4" class="text-center">Patients</th>
+              </tr>
+              <tr>
+                <th>Students</th>
+                <th>Employees</th>
+                <th>Others</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>${subrows}</tbody>
+            </table></div>`]).draw(false);
+        });
+      }
+      $('div#diagnosis_res').show();
     }
 
   });
