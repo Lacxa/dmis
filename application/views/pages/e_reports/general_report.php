@@ -386,6 +386,7 @@ $csrf = array(
         $(row).find('td table').DataTable({
           columns: columns,
           dom: 'tp',
+          "pageLength": 5,
         })
       },
     });

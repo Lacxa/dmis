@@ -2041,7 +2041,7 @@ class Patient_model extends CI_Model {
                     $inv_file = str_replace('@file:', '', $text[1]);
                     if($inv_file == 'null') $res['file'] = NULL;
                     else $res['file'] = $inv_file;
-                    $res['text'] = $inv_text;
+                    $res['text'] = str_replace('$$$', ' ', $inv_text);
 
                     $inv_data['results'] = $res;
                 }

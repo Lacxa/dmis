@@ -32,6 +32,8 @@
   $(function() {
 
   const title = 'Laboratory investigation list';
+
+  
   var table_investigations = $('#table_investigations').DataTable({
     oLanguage: {
       sProcessing: "loading...",      
